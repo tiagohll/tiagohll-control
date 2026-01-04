@@ -1,7 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr";
 
 export const createClient = () => {
-    // Definimos dentro da função para evitar erro no build estático
+    // Pegamos os valores dentro da função, com um fallback de string vazia
     const supabaseUrl =
         process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
     const supabaseKey =
