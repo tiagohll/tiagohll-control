@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, Loader2 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default function Login() {
     const supabase = createClient();
     const router = useRouter();

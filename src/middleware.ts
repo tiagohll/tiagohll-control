@@ -9,6 +9,10 @@ export const config = {
 export async function middleware(req: NextRequest) {
     const res = NextResponse.next();
 
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        return NextResponse.next();
+    }
+
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env
