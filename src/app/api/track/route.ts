@@ -31,8 +31,13 @@ export async function POST(req: Request) {
         return NextResponse.json(
             { success: true },
             {
+                status: 200,
                 headers: {
-                    "Access-Control-Allow-Origin": "*", // Libera para todos os clientes
+                    "Access-Control-Allow-Origin": "*", // LIBERA PARA TODOS OS SITES
+                    "Access-Control-Allow-Methods":
+                        "POST, OPTIONS",
+                    "Access-Control-Allow-Headers":
+                        "Content-Type",
                 },
             }
         );
