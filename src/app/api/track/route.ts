@@ -29,7 +29,7 @@ export async function POST(req: Request) {
                     site_id: body.site_id,
                     path: body.path,
                     event_type: "page_view",
-                    visitor_token: body.visitor_token,
+                    visitor_hash: body.visitor_token,
                 },
             ]);
 
