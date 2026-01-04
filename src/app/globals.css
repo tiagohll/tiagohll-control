@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+    --color-bprimary: #0b0f1a;
+    --color-bsecondary: #12182a;
+    --color-tprimary: #f5f7fa;
+    --color-tsecondary: #9aa4bf;
+    --color-tdesactived: #6b7391;
+    --color-primary: #7c5cff;
+    --color-hover: #6a4dff;
+    --color-outline: #a38bff;
+    --color-gradient-default: linear-gradient(
+        135deg,
+        #7c5cff 0%,
+        #38bdf8 100%
+    );
+    --color-gradient-clean: linear-gradient(
+        135deg,
+        #7c5cff 0%,
+        #5b8cff 100%
+    );
+    --color-link: #38bdf8;
+    --color-sucess: #22c55e;
+    --color-error: #ef4444;
+    --color-warning: #facc15;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.b-gradient-default {
+    background: var(--color-gradient-default) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text;
+}
+
+.b-gradient-clean {
+    background: var(--color-gradient-clean) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text;
+}
+
+.bg-gradient-default {
+    background: var(--color-gradient-default);
+}
+
+.bg-gradient-clean {
+    background: var(--color-gradient-clean);
+}
+
+.bg-mesh {
+    background-color: #030014;
+    background-image: radial-gradient(
+            at 0% 0%,
+            rgba(79, 70, 229, 0.15) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 100% 100%,
+            rgba(120, 80, 255, 0.1) 0px,
+            transparent 50%
+        );
+    position: relative;
+}
+
+/* O efeito de grade (grid) sutil */
+.bg-mesh::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+        );
+    background-size: 40px 40px;
+    mask-image: radial-gradient(
+        ellipse at center,
+        black,
+        transparent 80%
+    );
+}
+
+.bg-mesh-container {
+    background-color: #030014;
+    /* Um gradiente que cobre as duas seções de ponta a ponta */
+    background-image: radial-gradient(
+            at 0% 0%,
+            rgba(79, 70, 229, 0.15) 0%,
+            transparent 40%
+        ),
+        radial-gradient(
+            at 100% 100%,
+            rgba(120, 80, 255, 0.12) 0%,
+            transparent 40%
+        );
+    position: relative;
+}
+
+.bg-mesh-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+        );
+    background-size: 40px 40px;
+    /* Máscara suave para o grid não ficar forte demais nas bordas laterais */
+    mask-image: radial-gradient(
+        circle at center,
+        black 40%,
+        transparent 90%
+    );
+}
