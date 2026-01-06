@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📊 THLL Control
 
-## Getting Started
+O **THLL Control** é um painel de gerenciamento exclusivo para clientes, projetado para oferecer métricas claras e controle simplificado do seu site ou sistema. 
 
-First, run the development server:
+Diferente de ferramentas complexas e pesadas, o THLL Control foca no que realmente importa: dados diretos e gestão intuitiva, sem a poluição visual de editores tradicionais.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Funcionalidades Atuais
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+* **Métricas de Acesso:** Visualize o total de visitas do seu projeto de forma consolidada.
+* **Visão por Página:** Acompanhe o desempenho individual de cada seção do seu site.
+* **Ranking de Popularidade:** Identifique rapidamente quais são as páginas mais visitadas pelos seus usuários.
+* **Interface Minimalista:** Navegação rápida e direta, sem curvas de aprendizado.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🚀 Próxima Versão (Roadmap)
 
-To learn more about Next.js, take a look at the following resources:
+Estamos evoluindo para dar mais autonomia ao cliente, mantendo a simplicidade:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* **Edição de Conteúdo:** Possibilidade de editar textos do site diretamente pelo painel.
+* **Foco na Estrutura:** Sem editores estilo "WYSIWYG" (o que você vê é o que você tem) que costumam quebrar o layout. A edição será via campos simples, garantindo que o design original seja sempre preservado.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🛠️ Acesso ao Sistema
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Este é um software como serviço (SaaS) restrito a projetos desenvolvidos por **THLL**.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  **Login:** Utilize as credenciais fornecidas no momento da entrega do seu projeto.
+2.  **Dashboard:** Assim que logar, você terá o resumo estatístico na tela principal.
+3.  **Relatórios:** Navegue entre as abas para ver detalhes específicos de cada URL.
+
+---
+
+## 💡 Por que o THLL Control?
+
+A maioria dos gerenciadores de conteúdo atuais são genéricos e complexos. O **THLL Control** foi criado para clientes que desejam:
+1.  Saber se o site está sendo acessado.
+2.  Mudar uma informação textual de forma rápida.
+3.  Não ter medo de "estragar" o site ao clicar no botão errado.
+
+---
+*Desenvolvido por THLL - Soluções Web Sob Medida.*
