@@ -60,7 +60,6 @@ export default function Login() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-black p-4">
             <div className="w-full max-w-md space-y-8">
-                {/* Logo/Header */}
                 <div className="text-center">
                     <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-black">
                         <Lock size={24} />
@@ -74,7 +73,6 @@ export default function Login() {
                     </p>
                 </div>
 
-                {/* Card de Login */}
                 <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-8 shadow-2xl backdrop-blur-sm">
                     {error && (
                         <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-center text-xs text-red-400">

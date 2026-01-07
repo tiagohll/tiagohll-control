@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import SetupForm from "./setup-form";
-import { ExternalLink, Lock } from "lucide-react";
+import { ExternalLink, Lock, QrCode } from "lucide-react";
 
 export async function generateMetadata({
     params,
@@ -113,7 +113,6 @@ export default async function SitePage({
                         </div>
                     </div>
 
-                    {/* Tabs de Navegação */}
                     <nav className="flex gap-8 text-sm font-medium">
                         <div className="border-b-2 border-white pb-3 cursor-pointer">
                             Análises
@@ -121,12 +120,14 @@ export default async function SitePage({
                         <div className="text-zinc-500 pb-3 cursor-not-allowed flex items-center gap-1.5">
                             Edição <Lock size={12} />
                         </div>
+                        <div className="text-zinc-500 pb-3 cursor-not-allowed flex items-center gap-1.5">
+                            <QrCode size={12} /> QR Code
+                        </div>
                     </nav>
                 </div>
             </header>
 
             <main className="p-8 max-w-6xl mx-auto">
-                {/* Grid de Métricas */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl">
                         <p className="text-zinc-400 text-xs uppercase tracking-widest font-bold mb-2">
@@ -185,7 +186,6 @@ export default async function SitePage({
                     </div>
                 </div>
 
-                {/* Top Páginas */}
                 <section>
                     <h2 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-4">
                         Páginas Mais Visitadas
@@ -230,14 +230,15 @@ export default async function SitePage({
                                             </a>
                                         </div>
                                         <span className="text-sm font-medium">
-                                            {count} views
+                                            {count} visitas
                                         </span>
                                     </div>
                                 )
                             )
                         ) : (
                             <div className="p-8 text-center text-zinc-500 text-sm italic">
-                                Waiting for traffic data...
+                                Carregando dados de
+                                trafego...
                             </div>
                         )}
                     </div>
