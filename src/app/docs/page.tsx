@@ -262,13 +262,18 @@ export default function NextJsDocs() {
                                                         : "border-transparent hover:border-zinc-500 hover:text-white flex w-full items-center justify-between"
                                                 }`}
                                             >
-                                                {item.label}
+                                                <span>
+                                                    {
+                                                        item.label
+                                                    }
+                                                </span>
+
                                                 {item.new &&
                                                     item.id !=
                                                         currentSection && (
-                                                        <div className="p-1 flex items-center justify-center bg-blue-500 rounded-xl text-white w-fit text-[10px] font-bold ml-3">
+                                                        <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded text-[9px] font-bold ml-2">
                                                             NEW
-                                                        </div>
+                                                        </span>
                                                     )}
                                             </li>
                                         )
@@ -398,12 +403,14 @@ export default function Analytics({ siteId }) {
             text: "Monitore cliques em botões de WhatsApp.",
             code: `window.thll.track('whatsapp_conversion');`,
             filename: "Conversion.js",
+            info: "Este recurso esta em beta e pode ser alterado sem aviso prévio.",
         },
         custom: {
             title: "Eventos Customizados",
             text: "Envie dados personalizados como valores de venda ou nomes de leads.",
             code: `window.thll.track('purchase', { value: 97.00, currency: 'BRL' });`,
             filename: "Checkout.js",
+            info: "Este recurso esta em beta e pode ser alterado sem aviso prévio.",
         },
     };
 
