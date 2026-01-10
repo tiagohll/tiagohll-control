@@ -1,115 +1,134 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Globe, Plus, ArrowRight } from "lucide-react";
+import { Plus, Lock } from "lucide-react";
 import LogoutButton from "@/components/Buttons/logout";
-import { Metadata } from "next";
-
-export const metadata = {
-    title: "Projetos | THLL Control",
-    description:
-        "Visão geral das suas propriedades digitais.",
-};
+import SiteCard from "./site-card";
+import NewProjectFlow from "./sites/[id]/new-project-flow";
 
 export default async function Dashboard() {
     const supabase = await createClient();
 
+    // 1. Coleta dados do Usuário (Auth)
     const {
         data: { user },
-        error: authError,
     } = await supabase.auth.getUser();
-    if (authError || !user) redirect("/login");
+    if (!user) redirect("/login");
 
-    const { data: sites, error: sitesError } =
-        await supabase
+    // 2. Busca sites e perfil em paralelo
+    const [sitesRes, profileRes] = await Promise.all([
+        supabase
             .from("sites")
             .select("*")
-            .eq("user_id", user.id);
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false }),
+        supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single(),
+    ]);
 
-    if (sitesError)
-        throw new Error("Erro ao carregar seus dados.");
+    const sites = sitesRes.data || [];
+    const profile = profileRes.data;
 
-    // Lógica de Onboarding automática
-    if (!sites || sites.length === 0) {
-        const { data: newSite } = await supabase
-            .from("sites")
-            .insert({
-                user_id: user.id,
-                name: "Meu primeiro site",
-                url: "",
-            })
-            .select()
-            .single();
-
-        if (newSite)
-            redirect(`/dashboard/sites/${newSite.id}`);
+    // 3. Lógica de auto-correção do limite
+    let limit = profile?.site_max_limit;
+    if (limit === null || limit === undefined) {
+        limit = 1;
+        await supabase
+            .from("profiles")
+            .update({ site_max_limit: 1 })
+            .eq("id", user.id);
     }
+
+    const isLimitReached = sites.length >= limit;
+
+    // 4. Objeto completo para o Debug
+    const debugInfo = {
+        auth_user: {
+            id: user.id,
+            email: user.email,
+            last_sign_in: user.last_sign_in_at,
+            app_metadata: user.app_metadata,
+            user_metadata: user.user_metadata,
+        },
+        database_profile: profile,
+        stats: {
+            sites_count: sites.length,
+            limit_applied: limit,
+            is_limit_reached: isLimitReached,
+        },
+        raw_sites_data: sites,
+    };
 
     return (
         <div className="min-h-screen bg-black text-white p-8">
             <div className="max-w-6xl mx-auto">
-                <header className="flex justify-between items-center mb-12">
+                <header className="flex justify-between items-end mb-12">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
+                        <h1 className="text-4xl font-black tracking-tighter uppercase">
                             Meus Projetos
                         </h1>
-                        <p className="text-zinc-500">
-                            Gerencie o rastreamento de seus
-                            sites.
+                        <p className="text-zinc-500 font-bold text-xs mt-1 uppercase tracking-widest">
+                            {sites.length} / {limit} slots
+                            utilizados
                         </p>
                     </div>
-                    {/* Botão para o futuro: Adicionar Site */}
-                    <div className="flex gap-8 items-center">
-                        <button className="bg-white text-black px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-zinc-200 transition">
-                            <Plus size={16} /> Novo Projeto
-                        </button>
+
+                    <div className="flex gap-4 items-center">
+                        {/* Chamamos o componente que gerencia o botão e o formulário */}
+                        <NewProjectFlow
+                            isLimitReached={isLimitReached}
+                        />
                         <LogoutButton />
                     </div>
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {sites?.map((site) => (
-                        <Link
+                    {sites.map((site) => (
+                        <SiteCard
                             key={site.id}
-                            href={`/dashboard/sites/${site.id}`}
-                            className="group p-6 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-zinc-600 transition-all flex flex-col justify-between min-h-[160px]"
-                        >
-                            <div>
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="p-2 bg-zinc-800 rounded-lg group-hover:bg-blue-600/20 group-hover:text-blue-400 transition-colors">
-                                        <Globe size={20} />
-                                    </div>
-                                    <h3 className="font-bold text-lg">
-                                        {site.name}
-                                    </h3>
-                                </div>
-                                <p className="text-zinc-500 text-sm truncate">
-                                    {site.url ||
-                                        "Aguardando configuração..."}
-                                </p>
-                            </div>
-
-                            <div className="flex items-center justify-between mt-6">
-                                <span className="text-xs font-bold uppercase tracking-widest text-zinc-600 group-hover:text-zinc-400 transition-colors">
-                                    Ver Analytics
-                                </span>
-                                <ArrowRight
-                                    size={16}
-                                    className="text-zinc-600 group-hover:translate-x-1 group-hover:text-white transition-all"
-                                />
-                            </div>
-                        </Link>
+                            site={site}
+                        />
                     ))}
                 </div>
 
-                <details className="mt-16 text-[10px] text-zinc-800 border-t border-zinc-900 pt-4">
-                    <summary className="cursor-pointer hover:text-zinc-600">
-                        System Logs (Debug)
-                    </summary>
-                    <pre className="mt-2">
-                        {JSON.stringify(sites, null, 2)}
-                    </pre>
-                </details>
+                {/* System Logs Expandido */}
+                <footer className="mt-20">
+                    <details className="group opacity-20 hover:opacity-100 transition-opacity border-t border-zinc-900 pt-8">
+                        <summary className="text-[10px] font-black cursor-pointer uppercase tracking-[0.3em] text-zinc-500 list-none flex items-center gap-2">
+                            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                            System Logs (Full Session Data)
+                        </summary>
+                        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-4">
+                                <p className="text-[9px] font-bold text-zinc-600 uppercase">
+                                    Perfil & Limites
+                                </p>
+                                <pre className="text-[10px] bg-zinc-950 p-4 rounded-2xl border border-zinc-900 overflow-x-auto text-emerald-400">
+                                    {JSON.stringify(
+                                        debugInfo.database_profile,
+                                        null,
+                                        2
+                                    )}
+                                </pre>
+                            </div>
+                            <div className="md:col-span-2 space-y-4">
+                                <p className="text-[9px] font-bold text-zinc-600 uppercase">
+                                    Dados Brutos dos Sites
+                                </p>
+                                <pre className="text-[10px] bg-zinc-950 p-4 rounded-2xl border border-zinc-900 overflow-x-auto text-zinc-400">
+                                    {JSON.stringify(
+                                        debugInfo.raw_sites_data,
+                                        null,
+                                        2
+                                    )}
+                                </pre>
+                            </div>
+                        </div>
+                    </details>
+                </footer>
             </div>
         </div>
     );
