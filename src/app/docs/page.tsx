@@ -30,6 +30,8 @@ export default function NextJsDocs() {
         setTimeout(() => setIsCopied(false), 2000);
     };
 
+    document.title = `THLL Control Docs - ${currentSection.toUpperCase()}`;
+
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -47,7 +49,7 @@ export default function NextJsDocs() {
         {
             title: "Primeiros Passos",
             items: [
-                { id: "intro", label: "Introdução" },
+                { id: "introdução", label: "Introdução" },
                 {
                     id: "cors",
                     label: "Configuração de CORS",
