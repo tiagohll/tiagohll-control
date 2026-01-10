@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import {
@@ -30,7 +30,13 @@ export default function NextJsDocs() {
         setTimeout(() => setIsCopied(false), 2000);
     };
 
-    document.title = `THLL Control Docs - ${currentSection.toUpperCase()}`;
+    useEffect(() => {
+        document.body.classList.add("docs");
+        document.title = `THLL Control Docs - ${currentSection.toUpperCase()}`;
+        return () => {
+            document.body.classList.remove("docs");
+        };
+    }, []);
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
