@@ -547,14 +547,14 @@ export default function Analytics({ siteId }: { siteId: string }) {
                 (block: any, index: number) => {
                     if (block.type === "text") {
                         return (
-                            <p
+                            <div
                                 key={index}
                                 className="text-zinc-400 leading-relaxed mb-4"
                             >
                                 <ReactMarkdown>
                                     {block.value}
                                 </ReactMarkdown>
-                            </p>
+                            </div>
                         );
                     }
 

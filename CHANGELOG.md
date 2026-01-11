@@ -5,6 +5,21 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado no [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-01-11
+
+### Adicionado
+
+-   **Documentação de CSP(DOCS)**: Instruções detalhadas para configuração da diretiva connect-src no arquivo next.config.js.
+-   **Guia de Variáveis de Ambiente(DOCS)**: Seção dedicada à configuração do .env.local para URLs de rastreio e IDs de projeto.
+-   **Diferenciais de Produto(DOCS)**: Documentação sobre os benefícios de privacidade, performance (sem impacto em LCP/TBT) e rastreamento nativo de QR Codes/UTMs.
+-   **Alertas de Segurança(DOCS)**: Aviso sobre o uso de variáveis NEXT*PUBLIC* e o risco de exposição de chaves secretas no navegador.
+
+### Corrigido
+
+-   Erro de Hidratação (React Hydration Error): Correção de aninhamento inválido de tags HTML onde o componente <ReactMarkdown> estava sendo renderizado dentro de uma tag <p> no arquivo src/app/docs/page.tsx.
+
+-   Conectividade de API: Ajuste na configuração de cabeçalhos de segurança para permitir requisições de logs e visualizações de página para o domínio tiagohll-control.vercel.app.
+
 ## [1.0.0] - 2026-01-08
 
 ### Adicionado
