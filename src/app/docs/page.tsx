@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import {
@@ -13,6 +13,7 @@ import {
     Menu,
     X,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 
 export default function NextJsDocs() {
@@ -350,52 +351,48 @@ function DocContent({ id, onCopy, isCopied }: any) {
             content: [
                 {
                     type: "text",
-                    value: "O THLL Control é uma ferramenta de analytics leve e de alta performance, projetada especificamente para desenvolvedores que precisam de métricas precisas sem sacrificar a velocidade de carregamento (Web Vitals).",
+                    value: "O **THLL Control** é uma solução de analytics de alta performance, projetada para desenvolvedores que buscam métricas precisas sem comprometer os **Core Web Vitals**.",
                 },
                 {
                     type: "text",
-                    value: "Diferente de rastreadores pesados que carregam scripts de terceiros complexos, o THLL Control foca no essencial: monitorar o fluxo de usuários, origens de tráfego e conversões críticas em tempo real através de uma integração nativa com sua própria infraestrutura.",
+                    value: "Diferente de rastreadores convencionais que sobrecarregam o navegador com scripts de terceiros, o THLL Control foca no essencial: monitoramento de tráfego, conversões críticas e origem de leads em tempo real.",
                 },
                 {
                     type: "subtitle",
-                    value: "Por que usar?",
+                    value: "Diferenciais",
                 },
                 {
                     type: "text",
-                    value: "Privacidade: Você tem controle total sobre os dados coletados.",
+                    value: "• **Privacidade:** Controle total sobre os dados coletados, sem compartilhamento com terceiros.",
                 },
                 {
                     type: "text",
-                    value: "Performance: Script minimalista que não impacta o LCP (Largest Contentful Paint).",
+                    value: "• **Performance:** Script ultra-leve que não impacta o **LCP** ou o **TBT** da sua aplicação.",
                 },
                 {
                     type: "text",
-                    value: "Flexibilidade: Criado para funcionar perfeitamente com Next.js, mas compatível com qualquer site via Script Universal.",
-                },
-                {
-                    type: "text",
-                    value: "Inteligência de Origem: Rastreamento nativo de QR Codes e parâmetros UTM para identificar exatamente de onde vêm seus leads.",
+                    value: "• **Inteligência de Origem:** Rastreamento nativo de **QR Codes** e parâmetros **UTM** para atribuição precisa de leads.",
                 },
                 {
                     type: "info",
-                    value: "Compatível com todas as frameworks modernas e SSR (Server Side Rendering).",
+                    value: "Totalmente compatível com frameworks modernas, suportando **SSR (Server Side Rendering)** e **Static Generation**.",
                 },
             ],
         },
         csp: {
-            title: "Configuração de Segurança (CSP)",
+            title: "Segurança (CSP)",
             content: [
                 {
                     type: "text",
-                    value: "Se o seu site utiliza uma Content Security Policy (CSP) restritiva, você precisará autorizar o domínio do THLL Control para que as métricas sejam enviadas corretamente. Sem essa permissão, o navegador bloqueará o envio dos eventos por segurança.",
+                    value: "Caso seu projeto utilize uma **Content Security Policy (CSP)** restritiva, é necessário autorizar o domínio do THLL Control. Sem isso, o navegador bloqueará as requisições de telemetria.",
                 },
                 {
                     type: "subtitle",
-                    value: "Liberando o domínio na CSP",
+                    value: "Configurando a diretiva connect-src",
                 },
                 {
                     type: "text",
-                    value: "Você deve adicionar a URL https://tiagohll-control.vercel.app na diretiva connect-src do seu arquivo de configuração do Next.js. Isso permite que o seu site faça requisições (como o envio de logs e page views) para o nosso servidor.",
+                    value: "Adicione o domínio abaixo à diretiva `connect-src` no seu arquivo `next.config.js`. Isso habilita o envio de logs e eventos para nossos servidores.",
                 },
                 {
                     type: "code",
@@ -410,8 +407,7 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              // Adicione nossa URL no connect-src abaixo:
-              "connect-src 'self' https://tiagohll-control.vercel.app; " +
+              "connect-src 'self' https://tiagohll-control.vercel.app; " + // Domínio autorizado
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
               "style-src 'self' 'unsafe-inline'; " +
               "object-src 'none';",
@@ -428,49 +424,45 @@ export default nextConfig;`,
                 },
                 {
                     type: "info",
-                    value: "Se você já possui outras URLs no seu connect-src (como Google Analytics ou APIs próprias), basta adicionar a nossa URL separada por um espaço dentro da mesma string.",
+                    value: "Dica: Se já houver outros domínios no `connect-src`, basta separá-los por um espaço simples.",
                 },
                 {
                     type: "subtitle",
-                    value: "Como verificar se há bloqueio?",
+                    value: "Validando a Configuração",
                 },
                 {
                     type: "text",
-                    value: 'Abra o console do seu navegador (F12) no seu site. Se você vir um erro mencionando Content Security Policy directive: "connect-src...", significa que a permissão ainda não foi aplicada corretamente.',
+                    value: "Abra o Console do Navegador (F12). Se houver um erro de CSP mencionando o bloqueio de `connect-src`, verifique se a URL foi adicionada corretamente no arquivo de configuração.",
                 },
             ],
         },
         env: {
-            title: "Configuração de Variáveis de Ambiente",
+            title: "Variáveis de Ambiente",
             content: [
                 {
                     type: "text",
-                    value: "Para que o rastreador saiba para onde enviar os dados, você precisa configurar as variáveis de ambiente no seu projeto Next.js. Isso garante que, durante o desenvolvimento local, você possa testar sem poluir os dados de produção.",
+                    value: "As variáveis de ambiente definem o destino dos dados e o identificador do projeto. Recomendamos o isolamento entre ambientes para evitar a poluição dos dados de produção.",
                 },
                 {
                     type: "subtitle",
-                    value: "Configurando o arquivo .env.local",
+                    value: "Configuração do .env.local",
                 },
                 {
                     type: "text",
-                    value: "Na raiz do seu projeto, crie ou edite o arquivo .env.local. Este arquivo é ignorado pelo Git e deve conter suas chaves privadas e URLs de API.",
+                    value: "Crie ou edite o arquivo `.env.local` na raiz do seu projeto e adicione as seguintes chaves:",
                 },
                 {
                     type: "code",
-                    value: `# URL da sua API de rastreamento (onde os eventos serão salvos)
+                    value: `# Endpoint da API (fornecido no setup)
 NEXT_PUBLIC_ANALYTICS_URL=https://sua-api-thll.vercel.app/api/track
 
-# ID único do site para este projeto (gerado no seu dashboard)
-NEXT_PUBLIC_SITE_ID=seu_site_id_aqui"`,
+# ID único do site (encontrado no seu Dashboard)
+NEXT_PUBLIC_SITE_ID=seu_site_id_aqui`,
                     filename: ".env.local",
                 },
                 {
                     type: "info",
-                    value: "Lembre-se que variáveis que começam com NEXT_PUBLIC_ ficam expostas no navegador. Nunca coloque senhas de banco de dados ou chaves secretas com este prefixo.",
-                },
-                {
-                    type: "text",
-                    value: "Após adicionar essas variáveis, é necessário reiniciar o servidor de desenvolvimento (npm run dev) para que as alterações sejam aplicadas.",
+                    value: "⚠️ Segurança: Variáveis prefixadas com `NEXT_PUBLIC_` ficam acessíveis ao cliente (browser). Nunca armazene segredos ou credenciais de banco de dados aqui.",
                 },
             ],
         },
@@ -479,12 +471,11 @@ NEXT_PUBLIC_SITE_ID=seu_site_id_aqui"`,
             content: [
                 {
                     type: "text",
-                    value: "Para rastrear visitas no Next.js de forma eficiente, utilize o componente abaixo. Ele gerencia hashes de visitantes únicos e evita disparos duplicados em menos de 30 segundos.",
+                    value: "Para monitorar rotas no Next.js de forma otimizada, utilize o componente de monitoramento persistente. Ele gerencia sessões de visitantes e evita disparos redundantes.",
                 },
                 {
                     type: "code",
                     value: `"use client";
-
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
@@ -492,6 +483,7 @@ export default function Analytics({ siteId }: { siteId: string }) {
     const pathname = usePathname();
 
     useEffect(() => {
+        // Lógica de debounce e token de visita
         const today = new Date().toISOString().slice(0, 10);
         let token = localStorage.getItem("_track_token");
         let tokenDate = localStorage.getItem("_track_date");
@@ -502,16 +494,14 @@ export default function Analytics({ siteId }: { siteId: string }) {
             localStorage.setItem("_track_date", today);
         }
 
-        if (!token) return;
-
         const lastTrack = localStorage.getItem("_track_last");
         const now = Date.now();
+        
+        // Evita disparos repetidos em menos de 30s
         if (lastTrack && now - Number(lastTrack) < 30000) return;
 
         const urlParams = new URLSearchParams(window.location.search);
         const utmSource = urlParams.get("utm_source");
-        const currentPath = window.location.pathname + window.location.search;
-
         const ENDPOINT = process.env.NEXT_PUBLIC_ANALYTICS_URL || "https://tiagohll-control.vercel.app/api/track";
 
         fetch(ENDPOINT, {
@@ -520,7 +510,7 @@ export default function Analytics({ siteId }: { siteId: string }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 site_id: siteId,
-                path: currentPath,
+                path: window.location.pathname + window.location.search,
                 visitor_hash: token,
                 event_type: utmSource ? \`qr_\${utmSource}\` : "page_view",
             }),
@@ -535,15 +525,14 @@ export default function Analytics({ siteId }: { siteId: string }) {
                 },
                 {
                     type: "subtitle",
-                    value: "Como utilizar",
+                    value: "Implementação",
                 },
                 {
                     type: "text",
-                    value: "Importe o componente no seu layout.tsx principal para que ele monitore todas as rotas da aplicação.",
+                    value: "Importe o componente no seu `layout.tsx` principal. Por estar fora do Suspense e vinculado ao `pathname`, ele capturará todas as trocas de rota automaticamente.",
                 },
             ],
         },
-        // Adicione outras seções seguindo o mesmo padrão de array no 'content'
     };
 
     const data = sections[id] || sections.intro;
@@ -560,9 +549,11 @@ export default function Analytics({ siteId }: { siteId: string }) {
                         return (
                             <p
                                 key={index}
-                                className="text-base md:text-lg leading-relaxed mb-6 text-zinc-400"
+                                className="text-zinc-400 leading-relaxed mb-4"
                             >
-                                {block.value}
+                                <ReactMarkdown>
+                                    {block.value}
+                                </ReactMarkdown>
                             </p>
                         );
                     }
@@ -585,7 +576,7 @@ export default function Analytics({ siteId }: { siteId: string }) {
                                 className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-6 mb-8"
                             >
                                 <p className="text-sm text-blue-400 leading-relaxed italic">
-                                    <strong>Dica:</strong>{" "}
+                                    {/* <strong>Dica:</strong>{" "} */}
                                     {block.value}
                                 </p>
                             </div>
