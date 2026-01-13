@@ -5,8 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, Loader2 } from "lucide-react";
-
-export const dynamic = "force-dynamic";
+import Image from "next/image";
 
 export default function Login() {
     const supabase = createClient();
@@ -58,8 +57,21 @@ export default function Login() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-black p-4">
-            <div className="w-full max-w-md space-y-8">
+        <div className="relative flex min-h-screen items-center justify-center bg-black p-4 overflow-hidden">
+            {/* 2. A IMAGEM DE FUNDO */}
+            <div className="absolute inset-0 z-0">
+                <Image
+                    src="/logo-branca-png.svg"
+                    alt="Background"
+                    fill
+                    style={{ objectFit: "cover" }}
+                    priority
+                    className="object-cover opacity-[2%] max-w-2xl mx-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black" />
+            </div>
+
+            <div className="relative z-10 w-full max-w-md space-y-8">
                 <div className="text-center">
                     <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-black">
                         <Lock size={24} />
@@ -73,7 +85,7 @@ export default function Login() {
                     </p>
                 </div>
 
-                <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-8 shadow-2xl backdrop-blur-sm">
+                <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-8 shadow-2xl backdrop-blur-md">
                     {error && (
                         <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-center text-xs text-red-400">
                             {error}
@@ -102,7 +114,7 @@ export default function Login() {
                                         )
                                     }
                                     placeholder="seu@email.com"
-                                    className="w-full rounded-xl border border-zinc-800 bg-black py-3 pl-10 pr-4 text-white outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                                    className="w-full rounded-xl border border-zinc-800 bg-black/50 py-3 pl-10 pr-4 text-white outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                                 />
                             </div>
                         </div>
@@ -125,7 +137,7 @@ export default function Login() {
                                         )
                                     }
                                     placeholder="••••••••"
-                                    className="w-full rounded-xl border border-zinc-800 bg-black py-3 pl-10 pr-4 text-white outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                                    className="w-full rounded-xl border border-zinc-800 bg-black/50 py-3 pl-10 pr-4 text-white outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                                 />
                             </div>
                         </div>
@@ -133,7 +145,7 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 font-bold text-black transition-all hover:bg-zinc-200 disabled:opacity-50"
+                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 font-bold text-black transition-all hover:bg-zinc-200 disabled:opacity-50 active:scale-[0.98]"
                         >
                             {loading ? (
                                 <Loader2
