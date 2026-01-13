@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function DocsClient() {
     const [currentSection, setCurrentSection] =
@@ -156,10 +157,16 @@ export default function DocsClient() {
                         </button>
 
                         <div className="text-white font-bold tracking-tight text-sm flex items-center gap-2">
-                            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                            {/*                             <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
                                 <div className="w-3 h-3 bg-black rotate-45" />
-                            </div>
-                            <span className="hidden sm:inline text-zinc-500 font-normal italic">
+                            </div> */}
+                            <Image
+                                src="/logo-branca-png.svg"
+                                alt="Logo"
+                                width={48}
+                                height={48}
+                            />
+                            <span className="hidden sm:inline text-zinc-500 font-normal">
                                 Docs
                             </span>
                         </div>
@@ -211,7 +218,7 @@ export default function DocsClient() {
                 {/* SIDEBAR (ESQUERDA) */}
                 <aside
                     className={`
-                        lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] fixed inset-y-0 left-0 top-0 h-full z-50 w-72 bg-black border-r border-zinc-900 overflow-y-auto transform transition-transform duration-300 ease-in-out
+                        lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] fixed inset-y-0 left-0 top-0 h-full z-50 w-72 lg:bg-transparent bg-black border-r border-zinc-900 overflow-y-auto transform transition-transform duration-300 ease-in-out
                         ${
                             isMobileMenuOpen
                                 ? "translate-x-0"
@@ -446,7 +453,7 @@ export default nextConfig;`,
                 {
                     type: "code",
                     value: `# Endpoint da API (fornecido no setup)
-NEXT_PUBLIC_ANALYTICS_URL=https://sua-api-thll.vercel.app/api/track
+NEXT_PUBLIC_ANALYTICS_URL=https://tiagohll-control.vercel.app/api/track
 
 # ID único do site (encontrado no seu Dashboard)
 NEXT_PUBLIC_SITE_ID=seu_site_id_aqui`,
