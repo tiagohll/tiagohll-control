@@ -65,8 +65,8 @@ export default async function Dashboard() {
     return (
         <div className="min-h-screen bg-black text-white p-8">
             <div className="max-w-6xl mx-auto">
-                <header className="flex justify-between items-end mb-12">
-                    <div>
+                <header className="flex md: flex-col md:flex-row md:justify-between items-center md:items-end gap-2 md:gap-0 mb-12 duration-200">
+                    <div className="space-y-1 text-center md:text-left">
                         <h1 className="text-4xl font-black tracking-tighter uppercase">
                             Meus Projetos
                         </h1>
