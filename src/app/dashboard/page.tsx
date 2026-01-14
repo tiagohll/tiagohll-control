@@ -32,7 +32,6 @@ export default async function Dashboard() {
     const sites = sitesRes.data || [];
     const profile = profileRes.data;
 
-    // 3. Lógica de auto-correção do limite
     let limit = profile?.site_max_limit;
     if (limit === null || limit === undefined) {
         limit = 1;
@@ -77,7 +76,6 @@ export default async function Dashboard() {
                     </div>
 
                     <div className="flex gap-4 items-center">
-                        {/* Chamamos o componente que gerencia o botão e o formulário */}
                         <NewProjectFlow
                             isLimitReached={isLimitReached}
                         />
@@ -94,7 +92,6 @@ export default async function Dashboard() {
                     ))}
                 </div>
 
-                {/* System Logs Expandido */}
                 <footer className="mt-20">
                     <details className="group opacity-20 hover:opacity-100 transition-opacity border-t border-zinc-900 pt-8">
                         <summary className="text-[10px] font-black cursor-pointer uppercase tracking-[0.3em] text-zinc-500 list-none flex items-center gap-2">

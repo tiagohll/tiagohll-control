@@ -14,30 +14,26 @@ import { motion, AnimatePresence } from "framer-motion";
 // Estrutura de dados baseada no seu Changelog
 const VERSIONS_DATA = [
     {
-        version: "1.1.0",
-        date: "11 de Janeiro, 2026",
+        version: "1.2.0",
+        date: "14 de Janeiro, 2026",
         changes: [
             {
                 type: "added",
                 title: "Adicionado",
                 items: [
-                    "Documentação de CSP (DOCS)",
-                    "Guia de Variáveis de Ambiente",
-                    "Diferenciais de Produto",
-                    "Alertas de Segurança",
+                    "Track de Cliques",
+                    "Resumo do Sistema",
                 ],
             },
             {
                 type: "fixed",
                 title: "Corrigido",
                 items: [
-                    "Erro de Hidratação (React)",
-                    "Conectividade de API (vercel.app)",
+                    "Erros de digitação na página de documentação",
                 ],
             },
         ],
     },
-    // Você pode adicionar a 1.0.0 aqui futuramente
 ];
 
 export default function Versions() {

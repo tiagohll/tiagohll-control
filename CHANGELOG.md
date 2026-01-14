@@ -5,6 +5,19 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado no [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-01-14
+
+### Adicionado
+
+-   **Refatoração do DeatailsClient:** O arquivo principal agora e somente um "cérebro" de dados, movendo toda a loga de processamento de allEvents para os components.
+-   **Componentização Modular:** Criamos componentes independentes para as visualizações de dados, reduzindo a complexidade do arquivo principal e prevenindo erros de Hydration ao gerenciar melhor o estado no cliente.
+-   **Resumo do sistema:** Foi adicionado um sistema que resume todos os dados do site facilitando para o cliente visualizar o que realmente acontece e quais sao as metricas.
+-   **Cliques track:** Agora o sistema coleta os cliques do usuario.
+
+### Corrigido
+
+-   Erros de digitacão na página de documentação.
+
 ## [1.1.0] - 2026-01-11
 
 ### Adicionado
