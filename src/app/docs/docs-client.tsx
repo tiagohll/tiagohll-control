@@ -463,6 +463,18 @@ NEXT_PUBLIC_SITE_ID=seu_site_id_aqui`,
                     type: "info",
                     value: "⚠️ Segurança: Variáveis prefixadas com `NEXT_PUBLIC_` ficam acessíveis ao cliente (browser). Nunca armazene segredos ou credenciais de banco de dados aqui.",
                 },
+                {
+                    type: "subtitle",
+                    value: "Configuração em Produção (Vercel)",
+                },
+                {
+                    type: "text",
+                    value: "Para que o rastreamento funcione após o deploy, você deve cadastrar as mesmas variáveis acima no painel da Vercel em **Project Settings > Environment Variables**.",
+                },
+                {
+                    type: "text",
+                    value: "Você pode conferir o passo a passo detalhado na **[documentação oficial da Vercel](https://vercel.com/docs/projects/environment-variables).**",
+                },
             ],
         },
         nextjs: {
