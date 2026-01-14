@@ -650,6 +650,10 @@ export default function AnalyticsTracker() {
                     type: "info",
                     value: "Prioridade de Identificação: 1º data-track -> 2º id -> 3º Texto do Botão.",
                 },
+                {
+                    type: "info",
+                    value: "🚀 **Dica de Visualização**: Use nomes com hífens no `data-track` (ex: `botao-saiba-mais`). O dashboard converterá automaticamente para maiúsculas e removerá os hífens para uma leitura mais limpa.",
+                },
             ],
         },
     };
