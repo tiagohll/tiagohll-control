@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-    Info,
     X,
     PlusCircle,
     CheckCircle2,
@@ -14,7 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 // Estrutura de dados baseada no seu Changelog
 const VERSIONS_DATA = [
     {
-        version: "1.2.0",
+        version: "1.2.1",
         date: "14 de Janeiro, 2026",
         changes: [
             {
@@ -30,6 +29,7 @@ const VERSIONS_DATA = [
                 title: "Corrigido",
                 items: [
                     "Erros de digitação na página de documentação",
+                    "Agora o sistema analisa e da um resumo mais detalhado",
                 ],
             },
         ],

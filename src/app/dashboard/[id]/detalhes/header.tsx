@@ -8,6 +8,7 @@ import {
     RefreshCw,
     Calendar,
     Bot,
+    ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,6 +33,13 @@ export function HeaderNavigation({
     return (
         <header className="backdrop-blur-md sticky top-0 z-50 -mx-4 md:-mx-8 mb-8">
             <div className="max-w-full mx-auto px-4 md:px-8">
+                <Link
+                    href={`/dashboard/sites/${site.id}`}
+                    className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-sm mb-2"
+                >
+                    <ArrowLeft size={16} /> Voltar para o
+                    Início
+                </Link>
                 <div className="flex items-center justify-between border-b border-zinc-800 mb-8 py-2">
                     <nav className="flex gap-8 text-[11px] font-black uppercase tracking-widest">
                         {[
@@ -73,7 +81,6 @@ export function HeaderNavigation({
                         ))}
                     </nav>
 
-                    {/* Botão Refresh no canto direito da navegação */}
                     <button
                         onClick={handleRefresh}
                         className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"

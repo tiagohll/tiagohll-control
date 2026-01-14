@@ -15,6 +15,13 @@ export function ClickRanking({ allEvents }: any) {
         }, {})
     ).sort((a: any, b: any) => b[1] - a[1]);
 
+    if (clickRank.length === 0)
+        return (
+            <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-2xl text-zinc-500">
+                Nenhum evento de clique registrado.
+            </div>
+        );
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -24,9 +31,6 @@ export function ClickRanking({ allEvents }: any) {
                             key={label}
                             className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl relative overflow-hidden group"
                         >
-                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <MousePointer2 size={40} />
-                            </div>
                             <p className="text-[10px] font-black text-zinc-500 uppercase mb-1">
                                 ID do Elemento
                             </p>
