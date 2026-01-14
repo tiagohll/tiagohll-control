@@ -5,42 +5,59 @@ import { motion } from "framer-motion";
 import {
     Bot,
     Terminal,
-    MousePointer2,
     Clock,
-    Percent,
     Lightbulb,
     AlertTriangle,
     CheckCircle2,
 } from "lucide-react";
 
-export function SystemSummary({ allEvents }: any) {
+export function SystemSummary({
+    events = [],
+}: {
+    events: any[];
+}) {
     const [messages, setMessages] = useState<any[]>([]);
     const [isAnalyzing, setIsAnalyzing] = useState(true);
-    const analysisDone = useRef(false);
+    // Ref para rastrear timers e evitar execuções duplicadas ou vazamentos de memória
+    const timersRef = useRef<NodeJS.Timeout[]>([]);
 
     useEffect(() => {
-        if (analysisDone.current) return;
-        analysisDone.current = true;
+        // 1. LIMPEZA INICIAL
+        // Para todos os timers em execução e limpa as mensagens anteriores
+        timersRef.current.forEach(clearTimeout);
+        timersRef.current = [];
+        setMessages([]);
+        setIsAnalyzing(true);
 
         const generateSummary = () => {
-            const totalEvents = allEvents.length;
-            const totalViews = allEvents.filter(
+            const totalEvents = events.length;
+            const totalViews = events.filter(
                 (e: any) => e.event_type === "page_view"
             ).length;
-            const qrScans = allEvents.filter((e: any) =>
-                e.event_type?.startsWith("qr_")
-            ).length;
+            const qrScans = events.filter((e: any) => {
+                const type =
+                    e.event_type?.toLowerCase() || "";
+                return (
+                    type.includes("qr_") ||
+                    [
+                        "instagram",
+                        "guizao",
+                        "testes",
+                    ].includes(type)
+                );
+            }).length;
 
             const convRate =
                 totalViews > 0
                     ? (qrScans / totalViews) * 100
                     : 0;
+
+            // Lógica de Status
             let convStatus = {
-                label: "Ruim",
-                color: "text-red-400",
+                label: "Média",
+                color: "text-yellow-400",
                 icon: <AlertTriangle size={16} />,
             };
-
             if (convRate > 20)
                 convStatus = {
                     label: "Excelente",
@@ -49,31 +66,13 @@ export function SystemSummary({ allEvents }: any) {
                 };
             else if (convRate > 12)
                 convStatus = {
-                    label: "Bom",
+                    label: "Boa",
                     color: "text-blue-400",
                     icon: <CheckCircle2 size={16} />,
                 };
-            else if (convRate > 5)
-                convStatus = {
-                    label: "Médio",
-                    color: "text-yellow-400",
-                    icon: <AlertTriangle size={16} />,
-                };
 
-            // 2. Hipóteses de Causa (Regra 2)
-            let convInsight = "";
-            if (convRate <= 5)
-                convInsight =
-                    "Pode indicar um CTA fraco ou demora no carregamento da página destino.";
-            else if (convRate <= 12)
-                convInsight =
-                    "O público está interessado, mas o incentivo ao clique pode ser mais direto.";
-            else
-                convInsight =
-                    "Sua estratégia visual e oferta estão alinhadas com a expectativa do visitante.";
-
-            // 3. Detecção de Anomalia/Horário (Regra 3)
-            const hourCounts = allEvents.reduce(
+            // Horário de Pico
+            const hourCounts = events.reduce(
                 (acc: any, e: any) => {
                     const hour = new Date(
                         e.created_at
@@ -87,25 +86,22 @@ export function SystemSummary({ allEvents }: any) {
                 hourCounts
             ).sort((a: any, b: any) => b[1] - a[1])[0];
             const peakHour = peakHourEntry
-                ? parseInt(peakHourEntry[0])
-                : null;
-            const isDispersed =
-                peakHourEntry &&
-                (peakHourEntry[1] as number) <
-                    totalEvents * 0.15;
+                ? peakHourEntry[0]
+                : "--";
 
+            // DEFINIÇÃO DOS PASSOS (ID fixo por tipo evita duplicidade)
             const steps: any[] = [
                 {
-                    id: "init",
+                    id: "step-init",
                     text: "Sincronizando resumo inteligente...",
                     icon: <Terminal size={16} />,
                 },
             ];
 
-            if (totalEvents < 15) {
+            if (totalEvents < 5) {
                 steps.push({
-                    id: "empty",
-                    text: "Volume de dados insuficiente para gerar padrões confiáveis. Continue divulgando para desbloquear diagnósticos de conversão e horário.",
+                    id: "step-empty",
+                    text: "Volume de dados insuficiente para gerar padrões. Continue divulgando.",
                     icon: (
                         <Bot
                             size={16}
@@ -115,26 +111,20 @@ export function SystemSummary({ allEvents }: any) {
                 });
             } else {
                 steps.push({
-                    id: "conv",
+                    id: "step-conv",
                     text: `Taxa de conversão: ${convRate.toFixed(
                         1
-                    )}% (${
-                        convStatus.label
-                    }). ${convInsight}`,
+                    )}% (${convStatus.label}).`,
                     icon: convStatus.icon,
                     color: convStatus.color,
                 });
-
                 steps.push({
-                    id: "peak",
-                    text: isDispersed
-                        ? "Nenhum pico de acesso claro identificado. O tráfego está disperso ao longo do dia."
-                        : `Pico de atividade às ${peakHour}:00h. Este é o momento de maior impacto para novas ações.`,
+                    id: "step-peak",
+                    text: `Pico de atividade detectado às ${peakHour}:00h.`,
                     icon: <Clock size={16} />,
                 });
-
                 steps.push({
-                    id: "action",
+                    id: "step-action",
                     title: "Plano de Ação recomendado:",
                     isHighlight: true,
                     suggestions: [
@@ -142,12 +132,8 @@ export function SystemSummary({ allEvents }: any) {
                             label: "🎯 Principal",
                             text:
                                 convRate < 10
-                                    ? "Revise o contraste e o texto dos seus botões principais (CTA)."
-                                    : `Potencialize divulgações próximo das ${peakHour}:00h.`,
-                        },
-                        {
-                            label: "💡 Opcional",
-                            text: "Compare o desempenho entre acessos diretos e vindos de QR Code para validar a origem.",
+                                    ? "Melhore o CTA."
+                                    : `Poste às ${peakHour}:00h.`,
                         },
                     ],
                     icon: (
@@ -159,24 +145,41 @@ export function SystemSummary({ allEvents }: any) {
                 });
             }
 
+            // EXIBIÇÃO GRADUAL
             steps.forEach((step, index) => {
-                setTimeout(() => {
-                    setMessages((prev) => [...prev, step]);
+                const timer = setTimeout(() => {
+                    setMessages((prev) => {
+                        // Verifica se a mensagem já existe para evitar duplicatas visuais
+                        if (
+                            prev.find(
+                                (m) => m.id === step.id
+                            )
+                        )
+                            return prev;
+                        return [...prev, step];
+                    });
                     if (index === steps.length - 1)
                         setIsAnalyzing(false);
-                }, (index + 1) * 750);
+                }, (index + 1) * 600);
+
+                timersRef.current.push(timer);
             });
         };
 
         generateSummary();
-    }, [allEvents]);
+
+        // 2. FUNÇÃO DE LIMPEZA (Cleanup)
+        return () => {
+            timersRef.current.forEach(clearTimeout);
+        };
+    }, [events]);
 
     return (
         <div className="max-w-2xl mx-auto font-mono pb-10">
-            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-6 min-h-[480px] flex flex-col gap-5">
+            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-6 min-h-[400px] flex flex-col gap-5">
                 {messages.map((msg) => (
                     <motion.div
-                        key={msg.id}
+                        key={msg.id} // Agora a chave é única e estável (ex: 'step-init')
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={`flex gap-4 p-4 rounded-2xl ${
@@ -230,13 +233,14 @@ export function SystemSummary({ allEvents }: any) {
                         </div>
                     </motion.div>
                 ))}
+
                 {isAnalyzing && (
                     <div className="flex items-center gap-3 text-[10px] text-zinc-600 font-bold ml-14">
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                         </span>
-                        GERANDO DIAGNÓSTICO INTELIGENTE...
+                        ANALISANDO PADRÕES...
                     </div>
                 )}
             </div>
