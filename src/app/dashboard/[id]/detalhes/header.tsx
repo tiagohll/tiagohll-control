@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react"; // Adicionado useEffect
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
     Calendar as CalendarIcon,
@@ -23,7 +23,6 @@ export function HeaderNavigation({
     handleRefresh,
     isRefreshing,
 }: any) {
-    // 1. Criar um estado para verificar se já montou no cliente
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -90,7 +89,6 @@ export function HeaderNavigation({
                         </button>
                     ))}
 
-                    {/* 2. Envolver o Popover em um check de 'mounted' para evitar erro de ID do Radix */}
                     {mounted && (
                         <Popover>
                             <PopoverTrigger asChild>

@@ -8,7 +8,6 @@ export function SummaryCards({
     totalQRScans = 0,
     qrRank = [],
 }: any) {
-    // 1. Proteção para o Growth (toFixed)
     const safeGrowth = Number(growth || 0);
 
     return (

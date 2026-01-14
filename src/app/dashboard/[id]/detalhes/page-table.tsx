@@ -1,5 +1,5 @@
 export function PageTable({
-    paginatedPages = [], // Valor padrão caso venha undefined
+    paginatedPages = [],
     currentPage,
     totalPages,
     setCurrentPage,
@@ -20,7 +20,6 @@ export function PageTable({
             <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm min-w-[450px]">
                     <tbody className="divide-y divide-zinc-800/50">
-                        {/* Uso do ?.map para segurança total */}
                         {paginatedPages?.length > 0 ? (
                             paginatedPages.map(
                                 ([path, count]: any) => (
@@ -57,7 +56,6 @@ export function PageTable({
                 </table>
             </div>
 
-            {/* Paginação */}
             {totalPages > 1 && (
                 <div className="p-4 border-t border-zinc-800 flex justify-between items-center bg-zinc-900/50">
                     <button

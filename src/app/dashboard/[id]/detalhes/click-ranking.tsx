@@ -29,7 +29,6 @@ export function ClickRanking({
         );
     }, [events]);
 
-    // Forçamos o tipo number para evitar o erro ts(2363)
     const maxClicks = Number(ranking[0]?.[1] || 1);
 
     return (

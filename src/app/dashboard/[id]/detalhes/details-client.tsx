@@ -24,8 +24,6 @@ export function DetailsClient({
 
     const itemsPerPage = 5;
 
-    // Efeito para resetar a paginação
-    // O erro de "size changed" é resolvido ao recarregar a página (F5) após salvar o código
     useEffect(() => {
         setCurrentPage(1);
     }, [range, activeTab]);

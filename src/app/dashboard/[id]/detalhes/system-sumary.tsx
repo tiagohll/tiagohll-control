@@ -18,7 +18,6 @@ export function SystemSummary({
 }) {
     const [messages, setMessages] = useState<any[]>([]);
     const [isAnalyzing, setIsAnalyzing] = useState(true);
-    // Ref para rastrear timers e evitar execuções duplicadas ou vazamentos de memória
     const timersRef = useRef<NodeJS.Timeout[]>([]);
 
     useEffect(() => {
@@ -52,7 +51,6 @@ export function SystemSummary({
                     ? (qrScans / totalViews) * 100
                     : 0;
 
-            // Lógica de Status
             let convStatus = {
                 label: "Média",
                 color: "text-yellow-400",
@@ -71,7 +69,6 @@ export function SystemSummary({
                     icon: <CheckCircle2 size={16} />,
                 };
 
-            // Horário de Pico
             const hourCounts = events.reduce(
                 (acc: any, e: any) => {
                     const hour = new Date(
@@ -89,7 +86,6 @@ export function SystemSummary({
                 ? peakHourEntry[0]
                 : "--";
 
-            // DEFINIÇÃO DOS PASSOS (ID fixo por tipo evita duplicidade)
             const steps: any[] = [
                 {
                     id: "step-init",
@@ -149,7 +145,6 @@ export function SystemSummary({
             steps.forEach((step, index) => {
                 const timer = setTimeout(() => {
                     setMessages((prev) => {
-                        // Verifica se a mensagem já existe para evitar duplicatas visuais
                         if (
                             prev.find(
                                 (m) => m.id === step.id
@@ -179,7 +174,7 @@ export function SystemSummary({
             <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-6 min-h-[400px] flex flex-col gap-5">
                 {messages.map((msg) => (
                     <motion.div
-                        key={msg.id} // Agora a chave é única e estável (ex: 'step-init')
+                        key={msg.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={`flex gap-4 p-4 rounded-2xl ${
