@@ -69,6 +69,19 @@ export default function DocsClient() {
                 },
             ],
         },
+        {
+            title: "Rastreamento de Eventos",
+            items: [
+                {
+                    id: "rastreamento",
+                    label: "Código de Rastreamento Global",
+                },
+                {
+                    id: "cliques",
+                    label: "Rastreamento de Cliques (Botões)",
+                },
+            ],
+        },
     ];
 
     const allItems = menu.flatMap((g) => g.items);
@@ -532,7 +545,8 @@ export default function Analytics({ siteId }: { siteId: string }) {
 
     return null;
 }`,
-                    filename: "components/Analytics.tsx",
+                    filename:
+                        "components/Analytics/index.tsx",
                 },
                 {
                     type: "subtitle",
@@ -541,6 +555,100 @@ export default function Analytics({ siteId }: { siteId: string }) {
                 {
                     type: "text",
                     value: "Importe o componente no seu `layout.tsx` principal. Por estar fora do Suspense e vinculado ao `pathname`, ele capturará todas as trocas de rota automaticamente.",
+                },
+            ],
+        },
+        rastreamento: {
+            title: "Código de Rastreamento (Global)",
+            content: [
+                {
+                    type: "text",
+                    value: "Este componente deve ser adicionado ao seu `layout.tsx`. Ele cria um listener global que intercepta cliques em botões e links, enviando os dados automaticamente para o dashboard.",
+                },
+                {
+                    type: "code",
+                    value: `"use client";
+import { useEffect } from "react";
+
+export default function AnalyticsTracker() {
+    useEffect(() => {
+        const handleGlobalClick = (event: MouseEvent) => {
+            const target = (event.target as HTMLElement).closest("button, a");
+
+            if (target) {
+                const el = target as HTMLElement;
+                const buttonIdentifier =
+                    el.getAttribute("data-track") ||
+                    el.id ||
+                    el.innerText?.trim().slice(0, 20) ||
+                    "unnamed_element";
+
+                const payload = {
+                    site_id: process.env.NEXT_PUBLIC_SITE_ID,
+                    event_type: "click",
+                    path: window.location.pathname,
+                    visitor_hash: buttonIdentifier, // Identificador do botão
+                };
+
+                fetch(process.env.NEXT_PUBLIC_ANALYTICS_URL!, {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                    headers: { "Content-Type": "application/json" },
+                    keepalive: true,
+                }).catch(() => {});
+            }
+        };
+
+        document.addEventListener("click", handleGlobalClick);
+        return () => document.removeEventListener("click", handleGlobalClick);
+    }, []);
+
+    return null;
+}`,
+                    language: "typescript",
+                    filename:
+                        "components/Analytics/Tracker.tsx",
+                },
+                {
+                    type: "info",
+                    value: "O uso do 'keepalive: true' garante que a requisição seja finalizada mesmo se o usuário clicar em um link que mude de página imediatamente.",
+                },
+            ],
+        },
+        cliques: {
+            title: "Rastreamento de Cliques (Botões)",
+            content: [
+                {
+                    type: "text",
+                    value: "Com o componente global ativo, você pode marcar qualquer elemento para ser rastreado. O sistema segue uma hierarquia de prioridade para identificar o clique.",
+                },
+                {
+                    type: "subtitle",
+                    value: "Como identificar seus botões",
+                },
+                {
+                    type: "text",
+                    value: "Adicione o atributo `data-track` ou um `id` ao seu elemento. Se nenhum dos dois for fornecido, o sistema usará os primeiros 20 caracteres do texto interno do botão.",
+                },
+                {
+                    type: "code",
+                    value: `<button data-track="cta-comprar-agora">
+  Comprar Agora
+</button>
+
+<a href="/contato" id="link-contato">
+  Fale Conosco
+</a>
+
+<button>
+  Enviar Formulário
+</button>`,
+                    language: "html",
+                    filename: "BUTTONS-EXAMPLE",
+                },
+                {
+                    type: "info",
+                    value: "Prioridade de Identificação: 1º data-track -> 2º id -> 3º Texto do Botão.",
                 },
             ],
         },
