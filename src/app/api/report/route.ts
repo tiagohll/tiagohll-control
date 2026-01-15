@@ -1,64 +1,79 @@
-import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+export const dynamic = "force-dynamic";
+
+// Headers padrão para reutilizar
+const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+};
 
 export async function OPTIONS() {
     return new NextResponse(null, {
         status: 204,
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type",
-        },
+        headers: corsHeaders,
     });
 }
 
-export async function POST(request: Request) {
-    try {
-        const body = await request.json();
+export async function POST(req: Request) {
+    // Inicialização idêntica à sua API de track que funciona
+    const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+        process.env.SUPABASE_SERVICE_ROLE_KEY ?? ""
+    );
 
-        // Mapeamento dos campos do Modal
+    try {
+        const body = await req.json();
+        console.log("Payload Report recebido:", body);
+
         const { site_id, code, page, description, isDev } =
             body;
 
         if (!site_id) {
             return NextResponse.json(
                 { error: "site_id é obrigatório" },
-                { status: 400 }
+                { status: 400, headers: corsHeaders }
             );
         }
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
             .from("reports")
             .insert([
                 {
                     site_id,
                     error_code: code,
                     page_url: page,
-                    description,
-                    is_dev_error: isDev,
+                    description: description || "",
+                    is_dev_error: isDev || false,
                 },
             ])
             .select();
 
-        if (error) throw error;
+        if (error) {
+            console.error(
+                "Erro Supabase Report:",
+                error.message
+            );
+            return NextResponse.json(
+                { error: error.message },
+                { status: 500, headers: corsHeaders }
+            );
+        }
 
         return NextResponse.json(
             { success: true, data },
-            { status: 201 }
+            {
+                status: 201,
+                headers: corsHeaders,
+            }
         );
-    } catch (error: any) {
-        console.error(
-            "Erro na API de Report:",
-            error.message
-        );
+    } catch (err) {
+        console.error("Fail Report:", err);
         return NextResponse.json(
-            { error: "Erro interno ao salvar report" },
-            { status: 500 }
+            { error: "Fail" },
+            { status: 400, headers: corsHeaders }
         );
     }
 }
