@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import SetupForm from "./setup-form";
-import { ExternalLink, Lock, QrCode } from "lucide-react";
 import DashboardClient from "./DashboardClient";
 
 export async function generateMetadata({
@@ -58,64 +57,69 @@ export default async function SitePage({
         );
     }
 
-    // Analytics Data
+    // 1. BUSCA TODOS OS EVENTOS (Para o DashboardClient processar)
+    // Buscamos os últimos 2000 eventos para ter um histórico bom sem pesar o banco
+    const { data: allEvents } = await supabase
+        .from("analytics_events")
+        .select("*")
+        .eq("site_id", id)
+        .order("created_at", { ascending: false })
+        .limit(2000);
+
+    const events = allEvents || [];
+
+    // 2. FILTRAGEM DE ACESSOS REAIS (Ignora cliques para os cards principais)
+    const realAccesses = events.filter(
+        (ev) => ev.event_type !== "click"
+    );
+
+    // 3. ESTATÍSTICAS HOJE (Apenas Visitas)
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
+    const todayISO = startOfToday.toISOString();
 
-    const [totalRes, todayRes, allEventsRes] =
-        await Promise.all([
-            supabase
-                .from("analytics_events")
-                .select("*", { count: "exact", head: true })
-                .eq("site_id", id),
-            supabase
-                .from("analytics_events")
-                .select("*", { count: "exact", head: true })
-                .eq("site_id", id)
-                .gte(
-                    "created_at",
-                    startOfToday.toISOString()
-                ),
-            supabase
-                .from("analytics_events")
-                .select("path")
-                .eq("site_id", id)
-                .limit(1000),
-        ]);
+    const statsToday = realAccesses.filter(
+        (ev) => ev.created_at >= todayISO
+    ).length;
+    const statsTotal = realAccesses.length;
 
+    // 4. TOP PAGES (Limpar Query Strings)
     const pathCounts: Record<string, number> = {};
-    allEventsRes.data?.forEach((row) => {
-        pathCounts[row.path] =
-            (pathCounts[row.path] || 0) + 1;
+    realAccesses.forEach((row) => {
+        const cleanPath = row.path.split("?")[0]; // Remove ?utm...
+        pathCounts[cleanPath] =
+            (pathCounts[cleanPath] || 0) + 1;
     });
 
     const topPages = Object.entries(pathCounts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 3);
 
-    const { data: qrEvents } = await supabase
-        .from("analytics_events")
-        .select("event_type")
-        .eq("site_id", id)
-        .ilike("event_type", "qr_%"); // Filtra apenas tipos que começam com "qr_"
-
-    // Agrupar contagem
+    // 5. QR STATS (Já filtrando do que temos na memória)
     const qrCounts: Record<string, number> = {};
-    qrEvents?.forEach((ev) => {
-        const source = ev.event_type.replace("qr_", "");
-        qrCounts[source] = (qrCounts[source] || 0) + 1;
-    });
+    events
+        .filter((ev) => ev.event_type?.startsWith("qr_"))
+        .forEach((ev) => {
+            const source = ev.event_type
+                .replace("qr_", "")
+                .toUpperCase();
+            qrCounts[source] = (qrCounts[source] || 0) + 1;
+        });
 
     const qrStats = Object.entries(qrCounts).map(
-        ([source, count]) => ({ source, count })
+        ([source, count]) => ({
+            source,
+            count,
+        })
     );
 
     return (
         <DashboardClient
             site={site}
+            allEvents={events} // ESSENCIAL: Passamos a lista bruta para o gráfico
             stats={{
-                total: totalRes.count,
-                today: todayRes.count,
+                total: statsTotal,
+                today: statsToday,
             }}
             topPages={topPages}
             qrStats={qrStats}

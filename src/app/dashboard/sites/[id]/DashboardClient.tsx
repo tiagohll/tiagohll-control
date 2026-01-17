@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     ChevronLeft,
@@ -17,12 +17,43 @@ import Link from "next/link";
 
 export default function DashboardClient({
     site,
+    allEvents = [],
     stats,
     topPages,
     qrStats,
 }: any) {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("analises");
+
+    const cleanStats = useMemo(() => {
+        const realEvents = allEvents.filter(
+            (e: any) => e.event_type !== "click"
+        );
+        const today = new Date()
+            .toISOString()
+            .split("T")[0];
+
+        return {
+            total: realEvents.length,
+            today: realEvents.filter((e: any) =>
+                e.created_at.startsWith(today)
+            ).length,
+        };
+    }, [allEvents]);
+
+    const cleanTopPages = useMemo(() => {
+        const counts = allEvents
+            .filter((e: any) => e.event_type !== "click")
+            .reduce((acc: any, ev: any) => {
+                const path = ev.path.split("?")[0];
+                acc[path] = (acc[path] || 0) + 1;
+                return acc;
+            }, {});
+
+        return Object.entries(counts)
+            .sort((a: any, b: any) => b[1] - a[1])
+            .slice(0, 5); // Pega os 5 principais
+    }, [allEvents]);
 
     useEffect(() => {
         // Atualiza os dados (Server Components) a cada 15 segundos

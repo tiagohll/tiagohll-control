@@ -44,6 +44,7 @@ export default function AnalyticsSection({
                         Total Acumulado
                     </p>
                     <p className="text-4xl font-black tracking-tighter text-white">
+                        {/* Agora este número ignora cliques automaticamente */}
                         {stats.total.toLocaleString()}
                     </p>
                 </div>
@@ -62,6 +63,7 @@ export default function AnalyticsSection({
                         Páginas Mapeadas
                     </p>
                     <p className="text-4xl font-black tracking-tighter text-white">
+                        {/* topPages já vem filtrado do pai */}
                         {topPages.length}
                     </p>
                 </div>
@@ -139,13 +141,7 @@ export default function AnalyticsSection({
 
             {/* Tabela de Páginas Mais Visitadas */}
             <section className="space-y-6 pt-4">
-                <div className="flex items-center gap-4">
-                    <h2 className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] whitespace-nowrap">
-                        Top Links
-                    </h2>
-                    <div className="h-[1px] w-full bg-zinc-900" />
-                </div>
-
+                {/* ... header da seção ... */}
                 <div className="bg-zinc-900/20 border border-zinc-800 rounded-[2rem] overflow-hidden">
                     {topPages.length > 0 ? (
                         <div className="divide-y divide-zinc-800/50">
@@ -168,7 +164,8 @@ export default function AnalyticsSection({
                                                     )}
                                             </span>
                                             <span className="font-mono text-xs text-zinc-400 group-hover:text-zinc-200 transition-colors truncate max-w-[180px] md:max-w-md">
-                                                {path}
+                                                {path}{" "}
+                                                {/* Path já virá limpo sem ?utm=... */}
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-4">

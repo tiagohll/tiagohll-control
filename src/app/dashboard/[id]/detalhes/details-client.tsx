@@ -368,7 +368,8 @@ export function DetailsClient({
                             exit={{ opacity: 0 }}
                         >
                             <SystemSummary
-                                events={realAccesses}
+                                events={allEvents}
+                                siteName={site.name}
                             />
                         </motion.div>
                     )}

@@ -1,243 +1,267 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { motion } from "framer-motion";
 import {
-    Bot,
+    useEffect,
+    useState,
+    useRef,
+    useCallback,
+} from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import {
+    Sparkles,
+    Send,
+    User,
     Terminal,
-    Clock,
-    Lightbulb,
-    AlertTriangle,
-    CheckCircle2,
 } from "lucide-react";
 
 export function SystemSummary({
     events = [],
-}: {
-    events: any[];
+    siteName = "este projeto",
 }) {
     const [messages, setMessages] = useState<any[]>([]);
-    const [isAnalyzing, setIsAnalyzing] = useState(true);
-    const timersRef = useRef<NodeJS.Timeout[]>([]);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [input, setInput] = useState("");
+
+    const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const hasFetched = useRef(false);
+    const abortControllerRef =
+        useRef<AbortController | null>(null);
+
+    // Função de Scroll otimizada
+    const scrollToBottom = useCallback(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTo({
+                top: scrollRef.current.scrollHeight,
+                behavior: "smooth",
+            });
+        }
+    }, []);
 
     useEffect(() => {
-        // 1. LIMPEZA INICIAL
-        // Para todos os timers em execução e limpa as mensagens anteriores
-        timersRef.current.forEach(clearTimeout);
-        timersRef.current = [];
-        setMessages([]);
+        scrollToBottom();
+    }, [messages, isAnalyzing, scrollToBottom]);
+
+    // Ajuste da Textarea
+    useEffect(() => {
+        if (textAreaRef.current) {
+            textAreaRef.current.style.height = "auto";
+            textAreaRef.current.style.height = `${Math.min(textAreaRef.current.scrollHeight, 160)}px`;
+        }
+    }, [input]);
+
+    const askAI = async (userText?: string) => {
+        const text = userText || input;
+        if (!text || isAnalyzing) return;
+
+        // Cancela requisição anterior se houver
+        if (abortControllerRef.current)
+            abortControllerRef.current.abort();
+        abortControllerRef.current = new AbortController();
+
+        if (!userText) {
+            setMessages((prev) => [
+                ...prev,
+                { role: "user", text },
+            ]);
+            setInput("");
+        }
+
         setIsAnalyzing(true);
 
-        const generateSummary = () => {
-            const totalEvents = events.length;
-            const totalViews = events.filter(
-                (e: any) => e.event_type === "page_view"
-            ).length;
-            const qrScans = events.filter((e: any) => {
-                const type =
-                    e.event_type?.toLowerCase() || "";
-                return (
-                    type.includes("qr_") ||
-                    [
-                        "instagram",
-                        "guizao",
-                        "testes",
-                    ].includes(type)
-                );
-            }).length;
-
-            const convRate =
-                totalViews > 0
-                    ? (qrScans / totalViews) * 100
-                    : 0;
-
-            let convStatus = {
-                label: "Média",
-                color: "text-yellow-400",
-                icon: <AlertTriangle size={16} />,
-            };
-            if (convRate > 20)
-                convStatus = {
-                    label: "Excelente",
-                    color: "text-green-400",
-                    icon: <CheckCircle2 size={16} />,
-                };
-            else if (convRate > 12)
-                convStatus = {
-                    label: "Boa",
-                    color: "text-blue-400",
-                    icon: <CheckCircle2 size={16} />,
-                };
-
-            const hourCounts = events.reduce(
-                (acc: any, e: any) => {
-                    const hour = new Date(
-                        e.created_at
-                    ).getHours();
-                    acc[hour] = (acc[hour] || 0) + 1;
-                    return acc;
-                },
-                {}
-            );
-            const peakHourEntry = Object.entries(
-                hourCounts
-            ).sort((a: any, b: any) => b[1] - a[1])[0];
-            const peakHour = peakHourEntry
-                ? peakHourEntry[0]
-                : "--";
-
-            const steps: any[] = [
+        try {
+            const response = await fetch(
+                "/api/ai/analyze",
                 {
-                    id: "step-init",
-                    text: "Sincronizando resumo inteligente...",
-                    icon: <Terminal size={16} />,
-                },
-            ];
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    signal: abortControllerRef.current
+                        .signal,
+                    body: JSON.stringify({
+                        events: events.slice(0, 500),
+                        siteName,
+                        userQuestion: text,
+                    }),
+                }
+            );
 
-            if (totalEvents < 5) {
-                steps.push({
-                    id: "step-empty",
-                    text: "Volume de dados insuficiente para gerar padrões. Continue divulgando.",
-                    icon: (
-                        <Bot
-                            size={16}
-                            className="text-zinc-600"
-                        />
-                    ),
-                });
-            } else {
-                steps.push({
-                    id: "step-conv",
-                    text: `Taxa de conversão: ${convRate.toFixed(
-                        1
-                    )}% (${convStatus.label}).`,
-                    icon: convStatus.icon,
-                    color: convStatus.color,
-                });
-                steps.push({
-                    id: "step-peak",
-                    text: `Pico de atividade detectado às ${peakHour}:00h.`,
-                    icon: <Clock size={16} />,
-                });
-                steps.push({
-                    id: "step-action",
-                    title: "Plano de Ação recomendado:",
-                    isHighlight: true,
-                    suggestions: [
-                        {
-                            label: "🎯 Principal",
-                            text:
-                                convRate < 10
-                                    ? "Melhore o CTA."
-                                    : `Poste às ${peakHour}:00h.`,
-                        },
-                    ],
-                    icon: (
-                        <Lightbulb
-                            size={16}
-                            className="text-yellow-400"
-                        />
-                    ),
-                });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(
+                    errorData.error || "Erro na análise."
+                );
             }
 
-            // EXIBIÇÃO GRADUAL
-            steps.forEach((step, index) => {
-                const timer = setTimeout(() => {
-                    setMessages((prev) => {
-                        if (
-                            prev.find(
-                                (m) => m.id === step.id
-                            )
-                        )
-                            return prev;
-                        return [...prev, step];
-                    });
-                    if (index === steps.length - 1)
-                        setIsAnalyzing(false);
-                }, (index + 1) * 600);
+            const data = await response.json();
 
-                timersRef.current.push(timer);
-            });
-        };
+            setMessages((prev) => [
+                ...prev,
+                {
+                    role: "ai",
+                    text:
+                        data.text ||
+                        "Não foi possível gerar uma resposta.",
+                },
+            ]);
+        } catch (error: any) {
+            console.error("Erro na análise:", error);
+            setMessages((prev) => [
+                ...prev,
+                {
+                    role: "ai",
+                    text: "⚠️ **Limite de requisições atingido.** A Groq (Llama 3) limitou o uso temporariamente. Por favor, aguarde alguns minutos ou reduza a quantidade de dados enviados.",
+                },
+            ]);
+        } finally {
+            setIsAnalyzing(false); // ISSO PARA O CARREGAMENTO INFINITO
+        }
+    };
 
-        generateSummary();
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            askAI();
+        }
+    };
 
-        // 2. FUNÇÃO DE LIMPEZA (Cleanup)
-        return () => {
-            timersRef.current.forEach(clearTimeout);
-        };
-    }, [events]);
+    // Trigger Inicial - Corrigido para disparar apenas UMA vez
+    useEffect(() => {
+        if (events.length >= 1 && !hasFetched.current) {
+            hasFetched.current = true;
+            askAI(
+                "Faça uma análise inicial detalhada baseada nos eventos fornecidos."
+            );
+        }
+    }, [events.length]); // Monitora apenas o tamanho do array
 
     return (
-        <div className="max-w-2xl mx-auto font-mono pb-10">
-            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-6 min-h-[400px] flex flex-col gap-5">
-                {messages.map((msg) => (
-                    <motion.div
-                        key={msg.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`flex gap-4 p-4 rounded-2xl ${
-                            msg.isHighlight
-                                ? "bg-blue-500/10 border border-blue-500/20"
-                                : "bg-zinc-900/50 border border-zinc-800/30"
-                        }`}
-                    >
-                        <div
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                                msg.color || "text-blue-500"
-                            } bg-zinc-900 border border-zinc-800`}
-                        >
-                            {msg.icon}
+        <div className="w-full flex flex-col gap-4 antialiased">
+            <div className="flex flex-col h-[600px] bg-[#09090b] border border-zinc-800/50 rounded-3xl overflow-hidden shadow-2xl relative">
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4 bg-zinc-900/40 border-b border-zinc-800/50 backdrop-blur-md z-10">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 border border-blue-500/20">
+                            <Terminal
+                                size={16}
+                                className="text-blue-500"
+                            />
                         </div>
-                        <div className="space-y-3 flex-1">
-                            {msg.text && (
-                                <p className="text-zinc-300 text-sm leading-relaxed">
-                                    {msg.text}
-                                </p>
-                            )}
-                            {msg.title && (
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
-                                    {msg.title}
-                                </p>
-                            )}
-                            {msg.suggestions && (
-                                <div className="grid gap-2">
-                                    {msg.suggestions.map(
-                                        (
-                                            s: any,
-                                            i: number
-                                        ) => (
-                                            <div
-                                                key={i}
-                                                className="bg-black/30 p-3 rounded-xl border border-zinc-800/50"
-                                            >
-                                                <span className="text-[9px] font-black uppercase text-blue-500 block mb-1">
-                                                    {
-                                                        s.label
-                                                    }
-                                                </span>
-                                                <p className="text-xs text-zinc-400 leading-snug">
-                                                    {s.text}
-                                                </p>
-                                            </div>
-                                        )
+                        <div>
+                            <h2 className="text-[11px] font-bold text-zinc-100 uppercase tracking-wider">
+                                AI Analytics Engine
+                            </h2>
+                            <p className="text-[9px] text-zinc-500 font-medium uppercase tracking-[0.1em]">
+                                Llama 3.3 Insight
+                            </p>
+                        </div>
+                    </div>
+                    {isAnalyzing && (
+                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/5 border border-blue-500/20">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                            <span className="text-[9px] font-bold text-blue-500 uppercase">
+                                Processando...
+                            </span>
+                        </div>
+                    )}
+                </div>
+
+                {/* Chat Display */}
+                <div
+                    ref={scrollRef}
+                    className="flex-1 overflow-y-auto p-6 space-y-6 bg-transparent custom-scrollbar"
+                >
+                    <AnimatePresence initial={false}>
+                        {messages.map((m, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{
+                                    opacity: 0,
+                                    y: 10,
+                                }}
+                                animate={{
+                                    opacity: 1,
+                                    y: 0,
+                                }}
+                                className={`flex gap-4 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                            >
+                                <div
+                                    className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border shadow-sm ${
+                                        m.role === "user"
+                                            ? "bg-zinc-100 border-white text-zinc-900"
+                                            : "bg-zinc-900 border-zinc-800 text-blue-400"
+                                    }`}
+                                >
+                                    {m.role === "user" ? (
+                                        <User size={14} />
+                                    ) : (
+                                        <Sparkles
+                                            size={14}
+                                        />
                                     )}
                                 </div>
-                            )}
-                        </div>
-                    </motion.div>
-                ))}
 
-                {isAnalyzing && (
-                    <div className="flex items-center gap-3 text-[10px] text-zinc-600 font-bold ml-14">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                        </span>
-                        ANALISANDO PADRÕES...
+                                <div
+                                    className={`flex flex-col max-w-[85%] ${m.role === "user" ? "items-end" : "items-start"}`}
+                                >
+                                    <div
+                                        className={`p-4 rounded-2xl text-[13px] leading-relaxed ${
+                                            m.role ===
+                                            "user"
+                                                ? "bg-zinc-100 text-zinc-900 rounded-tr-none font-medium"
+                                                : "bg-zinc-900/60 text-zinc-300 border border-zinc-800/50 rounded-tl-none shadow-xl"
+                                        } ${m.role === "error" ? "border-red-500/50 bg-red-500/5 text-red-200" : ""}`}
+                                    >
+                                        <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed">
+                                            <ReactMarkdown>
+                                                {m.text}
+                                            </ReactMarkdown>
+                                        </div>
+                                    </div>
+                                    <span className="mt-1.5 text-[9px] text-zinc-600 font-bold uppercase tracking-widest px-1">
+                                        {m.role === "user"
+                                            ? "Solicitação"
+                                            : "Resposta da IA"}
+                                    </span>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                </div>
+
+                {/* Input Area */}
+                <div className="p-4 bg-zinc-900/30 border-t border-zinc-800/50 backdrop-blur-md">
+                    <div className="relative flex items-end gap-2 bg-black border border-zinc-800 rounded-2xl p-2 focus-within:border-blue-500/50 transition-all shadow-inner">
+                        <textarea
+                            ref={textAreaRef}
+                            rows={1}
+                            className="flex-1 bg-transparent border-none py-2.5 pl-3 pr-2 text-sm text-zinc-200 focus:outline-none resize-none max-h-40 placeholder:text-zinc-700"
+                            placeholder="Pergunte sobre os dados..."
+                            value={input}
+                            onChange={(e) =>
+                                setInput(e.target.value)
+                            }
+                            onKeyDown={handleKeyDown}
+                            disabled={isAnalyzing}
+                        />
+                        <button
+                            onClick={() => askAI()}
+                            disabled={
+                                isAnalyzing || !input.trim()
+                            }
+                            className="p-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl disabled:opacity-30 transition-all shadow-lg shrink-0"
+                        >
+                            <Send size={16} />
+                        </button>
                     </div>
-                )}
+                    <div className="mt-2 text-center">
+                        <p className="text-[8px] text-zinc-600 font-bold uppercase tracking-[0.2em]">
+                            {siteName} Analytics
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     );
