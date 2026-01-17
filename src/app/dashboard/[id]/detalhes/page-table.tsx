@@ -28,7 +28,11 @@ export function PageTable({
                                         className="group hover:bg-zinc-800/30 transition-colors"
                                     >
                                         <td className="py-4 px-6 font-medium text-zinc-400 group-hover:text-white transition-colors">
-                                            {path}
+                                            {
+                                                path.split(
+                                                    "?"
+                                                )[0]
+                                            }
                                         </td>
                                         <td className="py-4 px-6 text-right">
                                             <span className="font-black text-white">

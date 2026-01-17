@@ -15,8 +15,6 @@ export function DetailsClient({
     allEvents = [],
 }: any) {
     const router = useRouter();
-
-    // Hooks de estado sempre no topo e em ordem constante
     const [range, setRange] = useState("7d");
     const [activeTab, setActiveTab] = useState("acessos");
     const [currentPage, setCurrentPage] = useState(1);
@@ -34,8 +32,8 @@ export function DetailsClient({
         setTimeout(() => setIsRefreshing(false), 1000);
     };
 
-    // 1. FILTRAGEM DE EVENTOS (Corrigido para histórico desde 04/01)
-    const filteredEvents = useMemo(() => {
+    // 1. FILTRAGEM TEMPORAL BASE
+    const filteredEventsByTime = useMemo(() => {
         if (!allEvents || allEvents.length === 0) return [];
         if (range === "all") return allEvents;
 
@@ -73,25 +71,51 @@ export function DetailsClient({
         });
     }, [allEvents, range]);
 
-    // 2. DADOS DO GRÁFICO (Ajustado para o MainChart)
+    // 2. SEPARAÇÃO DE ACESSOS REAIS (Remove os Cliques para não sujar gráfico/tabela)
+    const realAccesses = useMemo(() => {
+        return filteredEventsByTime.filter(
+            (ev: any) => ev.event_type !== "click"
+        );
+    }, [filteredEventsByTime]);
+
+    // 3. ESTATÍSTICAS DE TRÁFEGO (QR vs SOCIAL)
+    const trafficStats = useMemo(() => {
+        const counts = realAccesses.reduce(
+            (acc: any, ev: any) => {
+                const type =
+                    ev.event_type?.toLowerCase() || "";
+                if (type.startsWith("qr_")) {
+                    const name = type
+                        .replace("qr_", "")
+                        .toUpperCase();
+                    acc.qr[name] = (acc.qr[name] || 0) + 1;
+                } else if (type.startsWith("ref_")) {
+                    const name = type
+                        .replace("ref_", "")
+                        .toUpperCase();
+                    acc.social[name] =
+                        (acc.social[name] || 0) + 1;
+                }
+                return acc;
+            },
+            { qr: {}, social: {} }
+        );
+
+        return {
+            qrRank: Object.entries(counts.qr).sort(
+                (a: any, b: any) => b[1] - a[1]
+            ),
+            socialRank: Object.entries(counts.social).sort(
+                (a: any, b: any) => b[1] - a[1]
+            ),
+        };
+    }, [realAccesses]);
+
+    // 4. DADOS PARA O GRÁFICO (Apenas Acessos Reais)
     const dynamicChartData = useMemo(() => {
         const daysToRender =
             range === "30d" ? 30 : range === "all" ? 45 : 7;
         const dataMap: Record<string, number> = {};
-
-        if (range.includes("-")) {
-            const label = range
-                .split("-")
-                .reverse()
-                .slice(0, 2)
-                .join("/");
-            return [
-                {
-                    date: label,
-                    visitors: filteredEvents.length,
-                },
-            ];
-        }
 
         for (let i = daysToRender - 1; i >= 0; i--) {
             const d = new Date();
@@ -103,7 +127,7 @@ export function DetailsClient({
             dataMap[label] = 0;
         }
 
-        filteredEvents.forEach((ev: any) => {
+        realAccesses.forEach((ev: any) => {
             const label = new Date(
                 ev.created_at
             ).toLocaleDateString("pt-BR", {
@@ -117,35 +141,32 @@ export function DetailsClient({
         return Object.entries(dataMap).map(
             ([date, visitors]) => ({ date, visitors })
         );
-    }, [filteredEvents, range]);
+    }, [realAccesses, range]);
 
-    // 3. RANKING QR CODE
-    const qrStats = useMemo(() => {
-        const counts = filteredEvents.reduce(
+    // 5. PAGINAÇÃO DA TABELA (Caminhos limpos sem fbclid)
+    const tableData = useMemo(() => {
+        const counts = realAccesses.reduce(
             (acc: any, ev: any) => {
-                const type =
-                    ev.event_type?.toLowerCase() || "";
-                if (
-                    type.includes("qr_") ||
-                    [
-                        "instagram",
-                        "guizao",
-                        "testes",
-                    ].includes(type)
-                ) {
-                    const name = type
-                        .replace("qr_", "")
-                        .toUpperCase();
-                    acc[name] = (acc[name] || 0) + 1;
-                }
+                const cleanPath = ev.path.split("?")[0]; // LIMPA A URL AQUI
+                acc[cleanPath] = (acc[cleanPath] || 0) + 1;
                 return acc;
             },
             {}
         );
-        return Object.entries(counts).sort(
+
+        const sorted = Object.entries(counts).sort(
             (a: any, b: any) => b[1] - a[1]
         );
-    }, [filteredEvents]);
+        const totalPages = Math.ceil(
+            sorted.length / itemsPerPage
+        );
+        const paginated = sorted.slice(
+            (currentPage - 1) * itemsPerPage,
+            currentPage * itemsPerPage
+        );
+
+        return { paginated, totalPages };
+    }, [realAccesses, currentPage]);
 
     return (
         <div className="min-h-screen bg-black text-zinc-100 p-4 md:p-8">
@@ -170,24 +191,156 @@ export function DetailsClient({
                         >
                             <SummaryCards
                                 totalPeriod={
-                                    filteredEvents.length
+                                    realAccesses.length
                                 }
-                                qrRank={qrStats}
-                                totalQRScans={qrStats.reduce(
+                                qrRank={trafficStats.qrRank}
+                                socialRank={
+                                    trafficStats.socialRank
+                                } // Nova prop para o Instagram
+                                totalQRScans={trafficStats.qrRank.reduce(
                                     (a: any, b: any) =>
                                         a + b[1],
                                     0
                                 )}
                                 totalAbsolute={
-                                    allEvents.length
+                                    allEvents.filter(
+                                        (e: any) =>
+                                            e.event_type !==
+                                            "click"
+                                    ).length
                                 }
                             />
                             <MainChart
                                 chartData={dynamicChartData}
                             />
-                            {/* Passamos filteredEvents para a tabela processar */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                                {/* Ranking de Redes Sociais / Links Externos */}
+                                <div className="bg-zinc-900 border border-zinc-800 rounded-[2rem] p-6">
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 mb-6 flex items-center gap-2">
+                                        <span className="w-2 h-2 bg-pink-500 rounded-full animate-pulse" />
+                                        Redes Sociais &
+                                        Links
+                                    </h3>
+                                    <div className="space-y-4">
+                                        {trafficStats
+                                            .socialRank
+                                            .length > 0 ? (
+                                            trafficStats.socialRank.map(
+                                                ([
+                                                    source,
+                                                    count,
+                                                ]: any) => (
+                                                    <div
+                                                        key={
+                                                            source
+                                                        }
+                                                        className="flex items-center justify-between"
+                                                    >
+                                                        <span className="text-sm font-bold text-zinc-300">
+                                                            {
+                                                                source
+                                                            }
+                                                        </span>
+                                                        <div className="flex items-center gap-3 flex-1 ml-4">
+                                                            <div className="h-1.5 bg-zinc-800 rounded-full flex-1 overflow-hidden">
+                                                                <motion.div
+                                                                    initial={{
+                                                                        width: 0,
+                                                                    }}
+                                                                    animate={{
+                                                                        width: `${(count / realAccesses.length) * 100}%`,
+                                                                    }}
+                                                                    className="h-full bg-pink-500/50"
+                                                                />
+                                                            </div>
+                                                            <span className="text-xs font-black text-white w-8 text-right">
+                                                                {
+                                                                    count
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            )
+                                        ) : (
+                                            <p className="text-xs text-zinc-600 italic">
+                                                Nenhum
+                                                acesso via
+                                                link externo
+                                                identificado.
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Ranking Detalhado de QR Codes */}
+                                <div className="bg-zinc-900 border border-zinc-800 rounded-[2rem] p-6">
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 mb-6 flex items-center gap-2">
+                                        <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                                        Localização dos QR
+                                        Codes
+                                    </h3>
+                                    <div className="space-y-4">
+                                        {trafficStats.qrRank
+                                            .length > 0 ? (
+                                            trafficStats.qrRank.map(
+                                                ([
+                                                    code,
+                                                    count,
+                                                ]: any) => (
+                                                    <div
+                                                        key={
+                                                            code
+                                                        }
+                                                        className="flex items-center justify-between"
+                                                    >
+                                                        <span className="text-sm font-bold text-zinc-300">
+                                                            {
+                                                                code
+                                                            }
+                                                        </span>
+                                                        <div className="flex items-center gap-3 flex-1 ml-4">
+                                                            <div className="h-1.5 bg-zinc-800 rounded-full flex-1 overflow-hidden">
+                                                                <motion.div
+                                                                    initial={{
+                                                                        width: 0,
+                                                                    }}
+                                                                    animate={{
+                                                                        width: `${(count / realAccesses.length) * 100}%`,
+                                                                    }}
+                                                                    className="h-full bg-blue-500/50"
+                                                                />
+                                                            </div>
+                                                            <span className="text-xs font-black text-white w-8 text-right">
+                                                                {
+                                                                    count
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            )
+                                        ) : (
+                                            <p className="text-xs text-zinc-600 italic">
+                                                Nenhum scan
+                                                de QR Code
+                                                identificado.
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                             <PageTable
-                                events={filteredEvents}
+                                paginatedPages={
+                                    tableData.paginated
+                                }
+                                currentPage={currentPage}
+                                totalPages={
+                                    tableData.totalPages
+                                }
+                                setCurrentPage={
+                                    setCurrentPage
+                                }
                             />
                         </motion.div>
                     )}
@@ -200,7 +353,9 @@ export function DetailsClient({
                             exit={{ opacity: 0 }}
                         >
                             <ClickRanking
-                                events={filteredEvents}
+                                events={
+                                    filteredEventsByTime
+                                }
                             />
                         </motion.div>
                     )}
@@ -213,7 +368,7 @@ export function DetailsClient({
                             exit={{ opacity: 0 }}
                         >
                             <SystemSummary
-                                events={filteredEvents}
+                                events={realAccesses}
                             />
                         </motion.div>
                     )}
