@@ -5,6 +5,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado no [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-01-18
+
+### Corrigido
+
+- **Growth do sumary Cards:** O valor estava sempre zerado agora ele realmente pega os valores reais.
+- **Documentação:** Atualizando a documentação para agora a versao que separa a origem do url.
+
 ## [1.3.0] - 2026-01-18
 
 ### Adicionado

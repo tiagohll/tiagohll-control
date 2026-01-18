@@ -495,7 +495,7 @@ NEXT_PUBLIC_SITE_ID=seu_site_id_aqui`,
             content: [
                 {
                     type: "text",
-                    value: "Para monitorar rotas no Next.js de forma otimizada, utilize o componente de monitoramento persistente. Ele gerencia sessões de visitantes e evita disparos redundantes.",
+                    value: "Para monitorar rotas no Next.js de forma otimizada, utilize o componente de monitoramento persistente. Ele gerencia sessões de visitantes, limpa parâmetros de rastreio e identifica origens de QR Code.",
                 },
                 {
                     type: "code",
@@ -507,7 +507,6 @@ export default function Analytics({ siteId }: { siteId: string }) {
     const pathname = usePathname();
 
     useEffect(() => {
-        // Lógica de debounce e token de visita
         const today = new Date().toISOString().slice(0, 10);
         let token = localStorage.getItem("_track_token");
         let tokenDate = localStorage.getItem("_track_date");
@@ -520,13 +519,24 @@ export default function Analytics({ siteId }: { siteId: string }) {
 
         const lastTrack = localStorage.getItem("_track_last");
         const now = Date.now();
-        
-        // Evita disparos repetidos em menos de 30s
         if (lastTrack && now - Number(lastTrack) < 30000) return;
 
         const urlParams = new URLSearchParams(window.location.search);
-        const utmSource = urlParams.get("utm_source");
+        const rawSource = urlParams.get("utm_source")?.toLowerCase();
+        const utmMedium = urlParams.get("utm_medium")?.toLowerCase();
+
+        let cleanSource = rawSource || "direto";
+        if (cleanSource === "ig") cleanSource = "instagram";
+        if (cleanSource === "fb") cleanSource = "facebook";
+
         const ENDPOINT = process.env.NEXT_PUBLIC_ANALYTICS_URL || "https://tiagohll-control.vercel.app/api/track";
+
+        let eventType = "page_view";
+        if (utmMedium === "qrcode") {
+            eventType = \`qr_\${cleanSource}\`;
+        } else if (rawSource) {
+            eventType = \`ref_\${cleanSource}\`;
+        }
 
         fetch(ENDPOINT, {
             method: "POST",
@@ -534,9 +544,9 @@ export default function Analytics({ siteId }: { siteId: string }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 site_id: siteId,
-                path: window.location.pathname + window.location.search,
+                path: window.location.pathname,
                 visitor_hash: token,
-                event_type: utmSource ? \`qr_\${utmSource}\` : "page_view",
+                event_type: eventType,
             }),
         })
         .then(() => localStorage.setItem("_track_last", Date.now().toString()))
@@ -554,7 +564,7 @@ export default function Analytics({ siteId }: { siteId: string }) {
                 },
                 {
                     type: "text",
-                    value: "Importe o componente no seu `layout.tsx` principal. Por estar fora do Suspense e vinculado ao `pathname`, ele capturará todas as trocas de rota automaticamente.",
+                    value: "Importe o componente no seu `layout.tsx` principal. Ele capturará automaticamente as trocas de rota e normalizará origens como 'ig' para 'instagram'.",
                 },
             ],
         },

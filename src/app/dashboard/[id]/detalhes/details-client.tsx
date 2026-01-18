@@ -9,6 +9,7 @@ import { MainChart } from "./main-chart";
 import { PageTable } from "./page-table";
 import { ClickRanking } from "./click-ranking";
 import { SystemSummary } from "./system-sumary";
+import { ChevronLeftIcon } from "lucide-react";
 
 export function DetailsClient({
     site,
@@ -168,9 +169,66 @@ export function DetailsClient({
         return { paginated, totalPages };
     }, [realAccesses, currentPage]);
 
+    // 6. CÁLCULO DE CRESCIMENTO (Growth)
+    const growthStats = useMemo(() => {
+        if (!allEvents || allEvents.length === 0) return 0;
+
+        const now = new Date();
+        const today = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+        ).getTime();
+
+        // Define quantos dias tem o intervalo atual (7 ou 30)
+        const days = range === "30d" ? 30 : 7;
+        const msPerDay = 24 * 60 * 60 * 1000;
+
+        // Período Atual: de (hoje - dias) até hoje
+        const currentPeriodCount = realAccesses.length;
+
+        // Período Anterior: de (hoje - dias*2) até (hoje - dias)
+        const previousPeriodStart =
+            today - days * 2 * msPerDay;
+        const previousPeriodEnd = today - days * msPerDay;
+
+        const previousPeriodAccesses = allEvents.filter(
+            (ev: any) => {
+                if (ev.event_type === "click") return false;
+                const evDate = new Date(
+                    ev.created_at
+                ).getTime();
+                return (
+                    evDate >= previousPeriodStart &&
+                    evDate < previousPeriodEnd
+                );
+            }
+        ).length;
+
+        // Cálculo da porcentagem
+        if (previousPeriodAccesses === 0)
+            return currentPeriodCount > 0 ? 100 : 0;
+
+        return (
+            ((currentPeriodCount - previousPeriodAccesses) /
+                previousPeriodAccesses) *
+            100
+        );
+    }, [allEvents, realAccesses, range]);
+
     return (
         <div className="min-h-screen bg-black text-zinc-100 p-4 md:p-8">
             <div className="max-w-5xl mx-auto space-y-8">
+                <div>
+                    <button
+                        onClick={() => router.back()}
+                        className="text-sm text-zinc-500 hover:text-zinc-300 transition flex gap-2 items-center"
+                    >
+                        <ChevronLeftIcon className="size-4" />{" "}
+                        Voltar para o Dashboard
+                    </button>
+                </div>
+
                 <HeaderNavigation
                     range={range}
                     setRange={setRange}
@@ -179,6 +237,12 @@ export function DetailsClient({
                     handleRefresh={handleRefresh}
                     isRefreshing={isRefreshing}
                 />
+
+                <div className="flex items-center gap-2">
+                    <h1 className="text-2xl font-bold">
+                        {site.name}
+                    </h1>
+                </div>
 
                 <AnimatePresence mode="wait">
                     {activeTab === "acessos" && (
@@ -193,6 +257,7 @@ export function DetailsClient({
                                 totalPeriod={
                                     realAccesses.length
                                 }
+                                growth={growthStats}
                                 qrRank={trafficStats.qrRank}
                                 socialRank={
                                     trafficStats.socialRank
