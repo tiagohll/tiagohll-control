@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
-import { ANALYST_PROMPT } from "@/lib/google-ia/prompts";
+import { ANALYST_PROMPT } from "@/lib/groq-ia/prompts";
 
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY,
@@ -11,8 +11,6 @@ export async function POST(req: Request) {
         const { events, siteName, userQuestion } =
             await req.json();
 
-        // 1. Amostragem radical para evitar estourar o limite de tokens
-        // Pegamos os 100 eventos mais recentes e simplificamos as chaves
         const simplifiedEvents = (events || [])
             .slice(0, 100)
             .map((e: any) => ({
@@ -34,10 +32,9 @@ export async function POST(req: Request) {
             simplifiedEvents
         );
 
-        // 2. Chamada para o Llama 3.1 8B (Mais rápido e com limites maiores que o 70B)
         const chatCompletion =
             await groq.chat.completions.create({
-                model: "llama-3.1-8b-instant", // TROCADO: Limites de tokens muito mais generosos
+                model: "llama-3.1-8b-instant",
                 messages: [
                     {
                         role: "system",
@@ -60,7 +57,6 @@ export async function POST(req: Request) {
     } catch (error: any) {
         console.error("Erro na Groq:", error);
 
-        // Se for erro de Rate Limit, avisa o usuário de forma clara
         if (error?.status === 429) {
             return NextResponse.json(
                 {

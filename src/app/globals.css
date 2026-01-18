@@ -274,3 +274,28 @@
     scrollbar-color: var(--color-zinc-600)
         var(--color-zinc-900);
 }
+
+@theme {
+    --animate-shimmer-spin: shimmer-spin 3s linear infinite;
+
+    @keyframes shimmer-spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+}
+
+@utility bg-ia-gradient {
+    /* Gradiente focado em tons de azul e brilho para o seu tema */
+    background: conic-gradient(
+        from 90deg at 50% 50%,
+        #3b82f6 0%,
+        /* blue-500 */ #1d4ed8 25%,
+        /* blue-700 */ #60a5fa 50%,
+        /* blue-400 */ #2563eb 75%,
+        /* blue-600 */ #3b82f6 100%
+    );
+}

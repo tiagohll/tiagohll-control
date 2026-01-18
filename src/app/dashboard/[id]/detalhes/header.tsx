@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import {
     Calendar as CalendarIcon,
     RefreshCw,
+    Sparkles, // Novo ícone para a IA
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -31,7 +32,6 @@ export function HeaderNavigation({
 
     const isCustom = range.includes("-");
 
-    // Função para formatar data com segurança
     const getFormattedDate = () => {
         if (!isCustom) return "Data";
         try {
@@ -47,28 +47,57 @@ export function HeaderNavigation({
 
     return (
         <header className="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-zinc-800/50 pb-6">
-            <nav className="flex gap-6">
-                {["acessos", "cliques", "resumo"].map(
-                    (t) => (
-                        <button
-                            key={t}
-                            onClick={() => setActiveTab(t)}
-                            className={`text-[11px] font-black uppercase tracking-widest pb-2 relative ${
-                                activeTab === t
-                                    ? "text-white"
-                                    : "text-zinc-500 hover:text-zinc-300"
-                            }`}
-                        >
-                            {t}
-                            {activeTab === t && (
-                                <motion.div
-                                    layoutId="nav"
-                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"
-                                />
-                            )}
-                        </button>
-                    )
-                )}
+            <nav className="flex items-center gap-2 bg-zinc-900/50 p-1 rounded-2xl border border-zinc-800/50">
+                {["acessos", "cliques"].map((t) => (
+                    <button
+                        key={t}
+                        onClick={() => setActiveTab(t)}
+                        className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                            activeTab === t
+                                ? "bg-zinc-800 text-white shadow-sm"
+                                : "text-zinc-500 hover:text-zinc-300"
+                        }`}
+                    >
+                        {t}
+                    </button>
+                ))}
+
+                {/* Botão de Resumo Especial - Tema Azul/Zinc */}
+                <button
+                    onClick={() => setActiveTab("resumo")}
+                    className="relative group p-[2px] rounded-xl overflow-hidden transition-all active:scale-95 flex items-center justify-center"
+                >
+                    {/* A Borda Giratória (Sutil no hover, intensa quando ativo) */}
+                    <div
+                        className={`absolute inset-[-1000%] animate-shimmer-spin bg-ia-gradient
+                        ${activeTab === "resumo" ? "opacity-100" : "opacity-0 group-hover:opacity-40"} 
+                        transition-opacity duration-500`}
+                    />
+
+                    {/* O Conteúdo do Botão */}
+                    <div
+                        className={`relative flex items-center gap-2 px-5 py-2 rounded-[11px] text-[11px] font-black uppercase tracking-widest z-10 
+                        ${
+                            activeTab === "resumo"
+                                ? "bg-zinc-950 text-blue-400"
+                                : "bg-zinc-900 text-zinc-500 group-hover:text-zinc-200"
+                        } 
+                        transition-colors duration-300 w-full h-full`}
+                    >
+                        <Sparkles
+                            size={14}
+                            className={`${activeTab === "resumo" ? "text-blue-400 animate-pulse" : "text-zinc-600 group-hover:text-blue-500"}`}
+                        />
+                        <span className="relative z-20">
+                            Resumo IA
+                        </span>
+
+                        {/* Brilho de Fundo (Glow) quando ativo */}
+                        {activeTab === "resumo" && (
+                            <div className="absolute inset-0 bg-blue-500/10 blur-lg rounded-full" />
+                        )}
+                    </div>
+                </button>
             </nav>
 
             <div className="flex items-center gap-3">

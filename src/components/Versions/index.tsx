@@ -7,31 +7,39 @@ import {
     CheckCircle2,
     ShieldCheck,
     History,
+    Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Estrutura de dados baseada no seu Changelog
 const VERSIONS_DATA = [
     {
-        version: "1.2.4",
-        date: "14 de Janeiro, 2026",
+        version: "1.3.0",
+        date: "18 de Janeiro, 2026",
         changes: [
             {
-                type: "added",
-                title: "Adicionado",
+                type: "ia",
+                title: "Inteligência Artificial",
                 items: [
-                    "Track de Cliques",
-                    "Resumo do Sistema",
+                    "Motor de análise integrado com Llama 3.1 via Groq Cloud",
+                    "Nova aba 'Resumo IA' com geração de insights automáticos",
+                    "Interface premium com bordas animadas em gradiente",
+                ],
+            },
+            {
+                type: "added",
+                title: "Melhorias de Performance",
+                items: [
+                    "Otimização de tokens para redução de latência na API",
+                    "Minificação de dados de contexto enviados ao servidor",
                 ],
             },
             {
                 type: "fixed",
                 title: "Corrigido",
                 items: [
-                    "Erros de digitação na página de documentação",
-                    "Agora o sistema analisa e da um resumo mais detalhado",
-                    "Filtro de periodos nos detalhes",
-                    "Metodo de salvar os hash de cliques",
+                    "Tratamento de erro para Rate Limit (429) da API",
+                    "Ajuste no loop de carregamento infinito do dashboard",
                 ],
             },
         ],
@@ -172,7 +180,21 @@ export default function Versions() {
                                                         className="text-blue-500"
                                                     />
                                                 )}
-                                                <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">
+                                                {group.type ===
+                                                    "ia" && (
+                                                    <Sparkles
+                                                        size={
+                                                            16
+                                                        }
+                                                        className="text-blue-400 animate-pulse"
+                                                    />
+                                                )}
+
+                                                <span
+                                                    className={
+                                                        "text-xs font-bold uppercase tracking-widest text-zinc-500"
+                                                    }
+                                                >
                                                     {
                                                         group.title
                                                     }
