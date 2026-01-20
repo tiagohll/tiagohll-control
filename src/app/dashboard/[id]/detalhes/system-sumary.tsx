@@ -15,6 +15,61 @@ import {
     Terminal,
 } from "lucide-react";
 
+const getProcessedStats = (events: any[]) => {
+    if (!events || events.length === 0)
+        return "Sem dados disponíveis.";
+
+    const total = events.length;
+    const clicks = events.filter(
+        (e) => e.event_type === "click"
+    ).length;
+    const qrTraffic = events.filter((e) =>
+        e.event_type.startsWith("qr_")
+    ).length;
+    const ctr = ((clicks / total) * 100).toFixed(2);
+
+    // Identificar horários de pico
+    const hours = events.map((e) =>
+        new Date(e.created_at).getHours()
+    );
+    const hourCounts: Record<number, number> = {};
+    hours.forEach(
+        (h) => (hourCounts[h] = (hourCounts[h] || 0) + 1)
+    );
+    const peakHour = Object.keys(hourCounts).reduce(
+        (a, b) =>
+            hourCounts[Number(a)] > hourCounts[Number(b)]
+                ? a
+                : b,
+        "0"
+    );
+
+    // Identificar conversão noturna (exemplo de insight profundo)
+    const nightEvents = events.filter((e) => {
+        const h = new Date(e.created_at).getHours();
+        return h >= 18 || h <= 6;
+    });
+    const nightClicks = nightEvents.filter(
+        (e) => e.event_type === "click"
+    ).length;
+    const nightCtr =
+        nightEvents.length > 0
+            ? (
+                  (nightClicks / nightEvents.length) *
+                  100
+              ).toFixed(2)
+            : "0";
+
+    return `
+    RESUMO ESTATÍSTICO (CONTEXTO REAL):
+    - Volume Total: ${total} eventos.
+    - Taxa de Clique Geral (CTR): ${ctr}%.
+    - Origem QR Code: ${qrTraffic} acessos (${((qrTraffic / total) * 100).toFixed(1)}% do tráfego).
+    - Horário de Pico: ${peakHour}:00h.
+    - Performance Noturna (18h-06h): ${nightEvents.length} visitas com ${nightCtr}% de conversão.
+    `;
+};
+
 export function SystemSummary({
     events = [],
     siteName = "este projeto",
@@ -55,11 +110,6 @@ export function SystemSummary({
         const text = userText || input;
         if (!text || isAnalyzing) return;
 
-        // Cancela requisição anterior se houver
-        if (abortControllerRef.current)
-            abortControllerRef.current.abort();
-        abortControllerRef.current = new AbortController();
-
         if (!userText) {
             setMessages((prev) => [
                 ...prev,
@@ -78,47 +128,45 @@ export function SystemSummary({
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    signal: abortControllerRef.current
-                        .signal,
                     body: JSON.stringify({
-                        events: events.slice(0, 500),
+                        statsContext:
+                            getProcessedStats(events), // DADOS MASTIGADOS
                         siteName,
                         userQuestion: text,
+                        events: events.slice(0, 150), // MENOS EVENTOS CRUS (POUPA TOKEN)
                     }),
                 }
             );
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.error || "Erro na análise."
-                );
-            }
-
             const data = await response.json();
-
             setMessages((prev) => [
                 ...prev,
                 {
                     role: "ai",
-                    text:
-                        data.text ||
-                        "Não foi possível gerar uma resposta.",
+                    text: data.text || "Sem resposta.",
                 },
             ]);
-        } catch (error: any) {
-            console.error("Erro na análise:", error);
+        } catch (error) {
             setMessages((prev) => [
                 ...prev,
                 {
                     role: "ai",
-                    text: "⚠️ **Limite de requisições atingido.** A Groq (Llama 3) limitou o uso temporariamente. Por favor, aguarde alguns minutos ou reduza a quantidade de dados enviados.",
+                    text: "⚠️ Erro de conexão ou limite atingido.",
                 },
             ]);
         } finally {
-            setIsAnalyzing(false); // ISSO PARA O CARREGAMENTO INFINITO
+            setIsAnalyzing(false);
         }
     };
+
+    useEffect(() => {
+        if (events.length >= 1 && !hasFetched.current) {
+            hasFetched.current = true;
+            askAI(
+                "Com base nos dados reais fornecidos, faça uma análise executiva focada em conversão."
+            );
+        }
+    }, [events.length]);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -126,16 +174,6 @@ export function SystemSummary({
             askAI();
         }
     };
-
-    // Trigger Inicial - Corrigido para disparar apenas UMA vez
-    useEffect(() => {
-        if (events.length >= 1 && !hasFetched.current) {
-            hasFetched.current = true;
-            askAI(
-                "Faça uma análise inicial detalhada baseada nos eventos fornecidos."
-            );
-        }
-    }, [events.length]); // Monitora apenas o tamanho do array
 
     return (
         <div className="w-full flex flex-col gap-4 antialiased">

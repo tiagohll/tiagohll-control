@@ -1,6 +1,4 @@
-// src/app/dashboard/[id]/detalhes/sumary-cards.tsx
-
-import { QrCode, MousePointer2, Users } from "lucide-react";
+import { QrCode, Users } from "lucide-react";
 
 export function SummaryCards({
     totalPeriod = 0,
