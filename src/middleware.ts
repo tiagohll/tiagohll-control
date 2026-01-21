@@ -1,17 +1,13 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import {
+    NextResponse,
+    type NextRequest,
+} from "next/server";
 
-export const config = {
-    matcher: ["/dashboard/:path*", "/login"],
-};
-
-export async function middleware(req: NextRequest) {
-    const res = NextResponse.next();
-
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        return NextResponse.next();
-    }
+export async function middleware(request: NextRequest) {
+    let response = NextResponse.next({
+        request: { headers: request.headers },
+    });
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,44 +16,31 @@ export async function middleware(req: NextRequest) {
         {
             cookies: {
                 getAll() {
-                    return req.cookies.getAll();
+                    return request.cookies.getAll();
                 },
                 setAll(cookiesToSet) {
                     cookiesToSet.forEach(
-                        ({ name, value, options }) => {
-                            res.cookies.set(
+                        ({ name, value, options }) =>
+                            request.cookies.set(name, value)
+                    );
+                    response = NextResponse.next({
+                        request,
+                    });
+                    cookiesToSet.forEach(
+                        ({ name, value, options }) =>
+                            response.cookies.set(
                                 name,
                                 value,
                                 options
-                            );
-                        }
+                            )
                     );
                 },
             },
         }
     );
 
-    const {
-        data: { session },
-    } = await supabase.auth.getSession();
+    // Isso refresca a sessão - Essencial para o getUser() funcionar
+    await supabase.auth.getUser();
 
-    const isLoginPage = req.nextUrl.pathname === "/login";
-    const isDashboard =
-        req.nextUrl.pathname.startsWith("/dashboard");
-
-    // BLOQUEAR LOGIN DASHBOARD
-    if (!session && isDashboard) {
-        return NextResponse.redirect(
-            new URL("/login", req.url)
-        );
-    }
-
-    // BLOQUEAR PAGINA DE LOGIN QUANDO LOGADO
-    if (session && isLoginPage) {
-        return NextResponse.redirect(
-            new URL("/dashboard", req.url)
-        );
-    }
-
-    return res;
+    return response;
 }

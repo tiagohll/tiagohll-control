@@ -26,8 +26,6 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        console.log("Payload Report recebido:", body);
-
         const { site_id, code, page, description, isDev } =
             body;
 
@@ -47,6 +45,7 @@ export async function POST(req: Request) {
                     page_url: page,
                     description: description || "",
                     is_dev_error: isDev || false,
+                    status: "pending",
                 },
             ])
             .select();

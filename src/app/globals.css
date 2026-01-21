@@ -299,3 +299,25 @@
         /* blue-600 */ #3b82f6 100%
     );
 }
+
+/* Para Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Para Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Para Internet Explorer e Edge */
+input::-ms-clear {
+    display: none;
+}
+
+/* Para remover a borda de foco (opcional) */
+input:focus {
+    outline: none;
+}
