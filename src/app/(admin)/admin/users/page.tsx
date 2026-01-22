@@ -72,56 +72,71 @@ export default async function AdminPage({
     ).length;
 
     return (
-        <div className="min-h-screen bg-[#050505] text-zinc-300 pb-20">
-            <div className="max-w-6xl mx-auto px-6 pt-12">
-                {/* HEADER */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-                    <div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight italic">
-                            THLL CONTROL
-                        </h1>
-                        <p className="text-zinc-500 mt-1 text-sm italic opacity-70">
-                            Gerenciamento Central de
-                            Usuários e Permissões.
+        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 min-h-screen text-white bg-[#050505]">
+            {/* HEADER */}
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 className="text-4xl font-black uppercase tracking-tighter italic">
+                        User
+                        <span className="text-blue-500">
+                            {" "}
+                            Control
+                        </span>
+                    </h1>
+                    <p className="text-zinc-500 text-sm font-medium italic">
+                        Gerenciamento central de usuários e
+                        permissões.
+                    </p>
+                </div>
+                <AddUserButton />
+            </header>
+
+            {/* MÉTRICAS (Estilo Cards do Dashboard) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                    {
+                        label: "Total de Usuários",
+                        value: totalUsers,
+                        color: "text-blue-500",
+                    },
+                    {
+                        label: "Administradores",
+                        value: totalAdmins,
+                        color: "text-emerald-500",
+                    },
+                    {
+                        label: "Status do Sistema",
+                        value: "Ativo",
+                        color: "text-blue-500",
+                        isStatus: true,
+                    },
+                ].map((item, i) => (
+                    <div
+                        key={i}
+                        className="bg-zinc-900/40 border border-white/5 p-8 rounded-[2.5rem] backdrop-blur-md"
+                    >
+                        <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
+                            {item.label}
                         </p>
+                        <h2 className="text-4xl font-black flex items-center gap-3">
+                            {item.value}
+                            {item.isStatus && (
+                                <span className="h-3 w-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]" />
+                            )}
+                        </h2>
                     </div>
-                    <AddUserButton />
+                ))}
+            </div>
+
+            {/* SEÇÃO DE FILTROS E TABELA */}
+            <div className="bg-zinc-900/40 border border-white/5 p-4 md:p-8 rounded-[3rem] backdrop-blur-md">
+                <div className="mb-8">
+                    <AdminFilters />
                 </div>
 
-                {/* MÉTRICAS */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div className="p-6 bg-zinc-900/30 border border-zinc-800/50 rounded-3xl backdrop-blur-sm">
-                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">
-                            Total de Usuários
-                        </p>
-                        <p className="text-3xl font-bold text-white">
-                            {totalUsers}
-                        </p>
-                    </div>
-                    <div className="p-6 bg-zinc-900/30 border border-zinc-800/50 rounded-3xl backdrop-blur-sm">
-                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">
-                            Administradores
-                        </p>
-                        <p className="text-3xl font-bold text-white">
-                            {totalAdmins}
-                        </p>
-                    </div>
-                    <div className="p-6 bg-zinc-900/30 border rounded-3xl border-blue-500/20 backdrop-blur-sm">
-                        <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">
-                            Status do Sistema
-                        </p>
-                        <div className="text-3xl font-bold text-white flex items-center gap-2">
-                            Ativo{" "}
-                            <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                        </div>
-                    </div>
+                <div className="overflow-hidden">
+                    <AdminTable profiles={profiles} />
                 </div>
-
-                {/* FILTROS - Agora sem a prop onFilterChange */}
-                <AdminFilters />
-
-                {/* TABELA */}
-                <AdminTable profiles={profiles} />
             </div>
         </div>
     );

@@ -13,6 +13,9 @@ import {
     Flag,
     Menu,
     X,
+    Layers,
+    Hash,
+    UserStarIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,7 +23,7 @@ const MENU_ITEMS = [
     {
         name: "Dashboard",
         icon: LayoutDashboard,
-        href: "/admin/dashboard",
+        href: "/admin",
     },
     {
         name: "Gerenciar Usuários",
@@ -28,14 +31,34 @@ const MENU_ITEMS = [
         href: "/admin/users",
     },
     {
+        name: "Clientes",
+        icon: UserStarIcon,
+        href: "/admin/costomers",
+    },
+    {
         name: "Financeiro",
         icon: PiggyBank,
         href: "/admin/finance",
     },
     {
+        name: "Projetos",
+        icon: ShieldCheck,
+        href: "/admin/projects",
+    },
+    {
         name: "Relatórios",
         icon: Flag,
         href: "/admin/reports",
+    },
+    {
+        name: "Orçamentos",
+        icon: Hash,
+        href: "/admin/proposals",
+    },
+    {
+        name: "Templates",
+        icon: Layers,
+        href: "/admin/templates",
     },
     {
         name: "Configurações",

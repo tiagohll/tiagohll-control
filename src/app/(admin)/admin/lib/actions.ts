@@ -80,8 +80,6 @@ export async function updateUserSettings(
 
 export async function deleteUser(userId: string) {
     try {
-        // 2. Use o supabaseAdmin para deletar
-        // O método auth.admin.deleteUser exige privilégios de Service Role
         const { error: authError } =
             await supabaseAdmin.auth.admin.deleteUser(
                 userId
@@ -95,7 +93,6 @@ export async function deleteUser(userId: string) {
             throw new Error(authError.message);
         }
 
-        // 3. Opcional: deletar o perfil manualmente se não houver CASCADE no banco
         await supabaseAdmin
             .from("profiles")
             .delete()
@@ -177,7 +174,6 @@ export async function addTransaction(formData: any) {
     const { description, amount, type, category } =
         formData;
 
-    // Se for custo (expense), garantimos que o número seja negativo para o cálculo de saldo
     const finalAmount =
         type === "expense"
             ? -Math.abs(amount)
@@ -196,5 +192,130 @@ export async function addTransaction(formData: any) {
 
     if (error) throw new Error(error.message);
 
-    revalidatePath("/admin/finance"); // Atualiza a página automaticamente
+    revalidatePath("/admin/finance");
+}
+
+export async function addServiceTemplate(formData: any) {
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data, error } = await supabase
+        .from("service_templates")
+        .insert([
+            {
+                name: formData.name,
+                price: formData.price,
+                delivery_days: formData.delivery_days,
+                pages_count: formData.pages_count,
+                has_thll_control: formData.has_thll_control,
+                features: formData.features,
+            },
+        ]);
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath("/admin/templates");
+    return data;
+}
+
+export async function convertProposalToProject({
+    proposal,
+    customerId,
+    newCustomerData,
+}: {
+    proposal: any;
+    customerId?: string;
+    newCustomerData?: {
+        name: string;
+        whatsapp: string;
+        email: string;
+    };
+}) {
+    const supabase = await createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    let finalCustomerId = customerId;
+
+    if (!customerId && newCustomerData) {
+        const { data: newCustomer, error: custError } =
+            await supabase
+                .from("customers")
+                .insert(newCustomerData)
+                .select()
+                .single();
+
+        if (custError)
+            throw new Error(
+                "Erro ao criar cliente: " +
+                    custError.message
+            );
+
+        finalCustomerId = newCustomer.id;
+    }
+
+    const cleanId =
+        typeof finalCustomerId === "object"
+            ? (finalCustomerId as any).id
+            : finalCustomerId;
+
+    if (!cleanId)
+        throw new Error(
+            "É necessário selecionar ou criar um cliente."
+        );
+
+    const { data: project, error: projError } =
+        await supabase
+            .from("projects")
+            .insert({
+                name:
+                    proposal.title ||
+                    `Projeto: ${proposal.client_name}`,
+                customer_id: cleanId,
+                total_value: proposal.total_price,
+                amount_paid: 0,
+                status: "confirmado",
+                deadline: proposal.estimated_delivery,
+            })
+            .select()
+            .single();
+
+    if (projError)
+        throw new Error(
+            "Erro ao criar projeto: " + projError.message
+        );
+
+    await supabase
+        .from("proposals")
+        .update({ status: "accepted" })
+        .eq("id", proposal.id);
+
+    revalidatePath("/admin/projects");
+    return project;
+}
+
+export async function updateProject(
+    id: string,
+    updates: {
+        status?: string;
+        amount_paid?: number;
+        name?: string;
+    }
+) {
+    const supabase = await createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { error } = await supabase
+        .from("projects")
+        .update(updates)
+        .eq("id", id);
+
+    if (error) throw error;
+
+    revalidatePath("/admin/projects");
 }

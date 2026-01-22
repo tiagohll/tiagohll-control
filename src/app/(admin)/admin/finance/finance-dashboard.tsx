@@ -97,12 +97,10 @@ export function FinanceDashboard({
                 </div>
             </div>
 
-            {isModalOpen && (
-                <AddTransactionModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                />
-            )}
+            <AddTransactionModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
 
             {/* Lista de Transações Recentes */}
             <div className="bg-zinc-950/50 border border-white/5 rounded-[2.5rem] p-8">

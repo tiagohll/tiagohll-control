@@ -5,6 +5,7 @@ import { X, Save, Shield, Globe } from "lucide-react";
 import { updateUserSettings } from "../../lib/actions";
 import { motion } from "framer-motion";
 import { useToast } from "@/context/ToastContext";
+import { createPortal } from "react-dom";
 
 export function AdminSettingsModal({
     profile,
@@ -47,8 +48,8 @@ export function AdminSettingsModal({
         }
     };
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    const modalContent = (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
             {/* Backdrop */}
             <motion.div
                 initial={{ opacity: 0 }}
@@ -69,6 +70,7 @@ export function AdminSettingsModal({
                     bounce: 0.3,
                 }}
                 className="relative bg-zinc-950 border border-zinc-800 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
             >
                 {/* HEADER */}
                 <div className="p-6 border-b border-zinc-900 flex justify-between items-center">
@@ -112,7 +114,7 @@ export function AdminSettingsModal({
                                     ) || 0
                                 )
                             }
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 transition-all font-bold"
+                            className="w-full bg-zinc-900/50 border border-white/5 rounded-2xl p-4 text-white focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all font-black text-xl italic"
                         />
                     </div>
 
@@ -162,13 +164,14 @@ export function AdminSettingsModal({
                     <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="flex-1 py-3 bg-white text-black rounded-xl text-sm font-black hover:bg-zinc-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="flex-1 py-4 bg-blue-600 text-white rounded-[1.2rem] text-[11px] font-black uppercase tracking-widest hover:bg-blue-500 disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2"
                     >
                         {loading ? (
-                            "Processando..."
+                            "PROCESSANDO..."
                         ) : (
                             <>
-                                <Save size={16} /> Salvar
+                                <Save size={16} /> SALVAR
+                                ALTERAÇÕES
                             </>
                         )}
                     </button>
@@ -176,4 +179,5 @@ export function AdminSettingsModal({
             </motion.div>
         </div>
     );
+    return createPortal(modalContent, document.body);
 }
