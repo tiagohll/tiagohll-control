@@ -43,20 +43,19 @@ export default function TemplatesPage() {
             supabase.removeChannel(channel);
         };
     }, []);
-
     return (
-        <div className="p-4 md:p-8 space-y-8 min-h-screen">
+        <div className="space-y-10">
             <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-6">
                 <div>
-                    <h1 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter text-center md:text-left leading-none">
-                        Templates de{" "}
-                        <span className="text-blue-500">
-                            Serviço
+                    <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
+                        TEMPLATES DE SERVIÇOS
+                        <span className="text-blue-600">
+                            .
                         </span>
                     </h1>
-                    <p className="text-zinc-500 font-medium uppercase text-[9px] tracking-[2px] mt-3 text-center md:text-left opacity-70">
-                        Sua vitrine de pacotes padrão
-                        configurada
+                    <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest mt-1">
+                        {templates.length} registros
+                        encontrados na base
                     </p>
                 </div>
                 <button

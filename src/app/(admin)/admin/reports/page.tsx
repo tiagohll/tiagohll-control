@@ -46,11 +46,14 @@ export default async function ReportsPage() {
             <header className="flex justify-between items-end">
                 <div>
                     <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
-                        Reports
+                        Relatórios
                         <span className="text-blue-600">
                             .
                         </span>
                     </h1>
+                    <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest mt-1">
+                        Relatórios de Erros
+                    </p>
                 </div>
                 <div className="text-right">
                     <p className="text-2xl font-black text-white">

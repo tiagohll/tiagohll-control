@@ -149,13 +149,18 @@ REGRAS DE CANCELAMENTO E MANUTENÇÃO:
     };
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 min-h-screen">
-            <h1 className="text-4xl font-black text-white uppercase tracking-tighter">
-                Gerador de{" "}
-                <span className="text-blue-500">
-                    Propostas
-                </span>
-            </h1>
+        <div className="space-y-10">
+            <div>
+                {" "}
+                <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
+                    TEMPLATES DE SERVIÇOS
+                    <span className="text-blue-600">.</span>
+                </h1>
+                <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest mt-1">
+                    {templates.length} registros encontrados
+                    na base
+                </p>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* COLUNA ESQUERDA: FORMULÁRIO */}

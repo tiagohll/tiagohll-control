@@ -72,20 +72,19 @@ export default async function AdminPage({
     ).length;
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 min-h-screen text-white bg-[#050505]">
+        <div className="space-y-10">
             {/* HEADER */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-4xl font-black uppercase tracking-tighter italic">
-                        User
-                        <span className="text-blue-500">
-                            {" "}
-                            Control
+                    <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
+                        Usuários
+                        <span className="text-blue-600">
+                            .
                         </span>
-                    </h1>
-                    <p className="text-zinc-500 text-sm font-medium italic">
-                        Gerenciamento central de usuários e
-                        permissões.
+                    </h1>{" "}
+                    <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest mt-1">
+                        Controle de Usuários e
+                        Administradores do Sistema
                     </p>
                 </div>
                 <AddUserButton />

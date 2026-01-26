@@ -16,7 +16,7 @@ export default async function CustomersPage() {
         .order("name");
 
     return (
-        <div className="p-8 max-w-[1400px] mx-auto space-y-8">
+        <div className="space-y-10">
             <CustomersList customers={customers || []} />
         </div>
     );

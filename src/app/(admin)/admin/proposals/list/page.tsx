@@ -8,8 +8,6 @@ import {
     Copy,
     Calendar,
     User,
-    ExternalLink,
-    Trash2,
 } from "lucide-react";
 import { useToast } from "@/context/ToastContext";
 
@@ -70,7 +68,7 @@ export default function ProposalsListPage() {
     );
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 min-h-screen">
+        <div className="space-y-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h1 className="text-4xl font-black text-white uppercase tracking-tighter">
                     Minhas{" "}

@@ -71,13 +71,16 @@ export default function ProjectsClient({
     };
 
     return (
-        <div className="p-8 max-w-[1600px] mx-auto space-y-8">
+        <div className="space-y-10">
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase">
-                        Gestão de Projetos
-                    </h1>
-                    <p className="text-zinc-500 text-sm mt-1">
+                    <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
+                        Projetos
+                        <span className="text-blue-600">
+                            .
+                        </span>
+                    </h1>{" "}
+                    <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest mt-1">
                         Controle de fluxo de trabalho e
                         saúde financeira por projeto.
                     </p>
