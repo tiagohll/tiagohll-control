@@ -97,7 +97,7 @@ export function Sidebar() {
                             </span>
                         </span>
                         <span className="text-[9px] text-zinc-500 font-bold tracking-[1px] uppercase mt-1">
-                            v1.3.0
+                            v1.3.3
                         </span>
                     </div>
                 </div>
