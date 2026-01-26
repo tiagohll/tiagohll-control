@@ -60,11 +60,6 @@ const MENU_ITEMS = [
         icon: Layers,
         href: "/admin/templates",
     },
-    {
-        name: "Configurações",
-        icon: Settings,
-        href: "/admin/settings",
-    },
 ];
 
 export function Sidebar() {
@@ -162,13 +157,16 @@ export function Sidebar() {
             </nav>
 
             <div className="p-4 border-t border-white/5 bg-black/20 mt-auto">
-                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:text-red-400 hover:bg-red-500/5 transition-all font-bold text-xs uppercase tracking-widest group">
+                <Link
+                    href="/dashboard"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:text-red-400 hover:bg-red-500/5 transition-all font-bold text-xs uppercase tracking-widest group"
+                >
                     <LogOut
                         size={16}
                         className="group-hover:-translate-x-1 transition-transform"
                     />
                     Sair do Painel
-                </button>
+                </Link>
             </div>
         </>
     );
