@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     ChevronLeft,
     ChevronRight,
+    Database,
     ExternalLink,
     Lock,
     QrCode,
@@ -14,6 +15,7 @@ import AnalyticsSection from "./analytics-section";
 import QRCodeSection from "./qr-code-section";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import DatabaseSection from "./database-section";
 
 export default function DashboardClient({
     site,
@@ -159,6 +161,26 @@ export default function DashboardClient({
                             )}
                         </button>
 
+                        <button
+                            onClick={() =>
+                                setActiveTab("database")
+                            }
+                            className={`pb-3 transition-colors flex items-center gap-1.5 relative ${
+                                activeTab === "database"
+                                    ? "text-white"
+                                    : "text-zinc-600 hover:text-zinc-400"
+                            }`}
+                        >
+                            <Database size={14} /> Banco de
+                            Dados
+                            {activeTab === "database" && (
+                                <motion.div
+                                    layoutId="tab"
+                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"
+                                />
+                            )}
+                        </button>
+
                         <div className="text-zinc-800 pb-3 cursor-not-allowed flex items-center gap-1.5 opacity-50">
                             Configurações <Lock size={10} />
                         </div>
@@ -175,17 +197,22 @@ export default function DashboardClient({
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
                     >
-                        {activeTab === "analises" ? (
+                        {activeTab === "analises" && (
                             <AnalyticsSection
                                 site={site}
                                 stats={stats}
                                 topPages={topPages}
                             />
-                        ) : (
+                        )}
+
+                        {activeTab === "qrcode" && (
                             <QRCodeSection
                                 qrStats={qrStats}
                                 site={site}
                             />
+                        )}
+                        {activeTab === "database" && (
+                            <DatabaseSection />
                         )}
                     </motion.div>
                 </AnimatePresence>
