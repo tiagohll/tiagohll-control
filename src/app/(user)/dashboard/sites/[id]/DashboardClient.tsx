@@ -212,7 +212,7 @@ export default function DashboardClient({
                             />
                         )}
                         {activeTab === "database" && (
-                            <DatabaseSection />
+                            <DatabaseSection site={site} />
                         )}
                     </motion.div>
                 </AnimatePresence>

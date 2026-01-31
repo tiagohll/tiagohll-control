@@ -55,7 +55,11 @@ const tables = [
     "project_details",
 ];
 
-export default function DatabaseGrid() {
+export default function DatabaseGrid({
+    site,
+}: {
+    site: any;
+}) {
     return (
         <div className="space-y-10">
             <header className="space-y-4 px-2 mb-10">
@@ -97,7 +101,7 @@ export default function DatabaseGrid() {
                             }}
                         >
                             <Link
-                                href={`../database/${tableId}`}
+                                href={`/dashboard/${site.id}/edicao/${tableId}`}
                                 className="group relative block h-[320px] w-full rounded-[2.5rem] overflow-hidden bg-zinc-900 border border-white/5 transition-all duration-500 hover:border-blue-500/50 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)]"
                             >
                                 {/* Imagem de Fundo com Overlay */}
