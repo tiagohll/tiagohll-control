@@ -7,7 +7,6 @@ import {
     Trash2,
     Image as ImageIcon,
     Plus,
-    Hash,
     AlertCircle,
     Loader2,
 } from "lucide-react";
@@ -17,7 +16,6 @@ import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function EditPage() {
-    // CORREÇÃO 1: Pegar os nomes exatos dos parâmetros da URL
     const params = useParams();
     const siteId = params.id as string;
     const projectId = params.projectId as string;
@@ -32,39 +30,46 @@ export default function EditPage() {
     const [title, setTitle] = useState("");
     const [category, setCategory] = useState("");
     const [bannerUrl, setBannerUrl] = useState("");
+    const [siteBaseUrl, setSiteBaseUrl] = useState("");
     const [paragraphs, setParagraphs] = useState<any[]>([]);
 
     const fetchProjectData = useCallback(async () => {
         try {
             setLoading(true);
 
-            // 1. Busca os dados do projeto
+            // 1. Busca os dados do projeto E os dados do site (Join)
+            // Precisamos do site_id que está no user_projects para buscar a URL na tabela de sites
             const { data: project, error } = await supabase
                 .from("user_projects")
-                .select("*")
+                .select(
+                    `
+                    *,
+                    sites:site_id ( url )
+                `
+                )
                 .eq("id", projectId)
                 .maybeSingle();
 
-            if (error) {
+            if (error || !project) {
                 console.error(
-                    "Erro na query:",
-                    error.message
+                    "Erro na query ou projeto não encontrado"
                 );
                 setNotFound(true);
                 return;
             }
 
-            if (!project) {
-                setNotFound(true);
-                return;
-            }
-
-            // 2. Popula os estados do formulário com os dados do banco
+            // 2. Popula os estados
             setTitle(project.title || "");
             setCategory(project.category_type || "");
             setBannerUrl(project.image_banner || "");
 
-            // 3. Busca os parágrafos (se existirem)
+            // Pega a URL do site pai
+            const rawUrl =
+                (project.sites as any)?.url || "";
+            // Garante que termina sem '/' para não duplicar na concatenação
+            setSiteBaseUrl(rawUrl.replace(/\/$/, ""));
+
+            // 3. Busca os parágrafos
             const { data: paras, error: pError } =
                 await supabase
                     .from("project_paragraphs")
@@ -74,9 +79,7 @@ export default function EditPage() {
                         ascending: true,
                     });
 
-            if (!pError && paras) {
-                setParagraphs(paras);
-            }
+            if (!pError && paras) setParagraphs(paras);
         } catch (err) {
             console.error("Erro inesperado:", err);
         } finally {
@@ -87,6 +90,13 @@ export default function EditPage() {
     useEffect(() => {
         if (projectId) fetchProjectData();
     }, [projectId, fetchProjectData]);
+
+    // Função auxiliar para resolver a URL da imagem
+    const getFullImageUrl = (path: string) => {
+        if (!path) return "";
+        if (path.startsWith("http")) return path;
+        return `${siteBaseUrl}${path.startsWith("/") ? "" : "/"}${path}`;
+    };
 
     const handleSaveAll = async () => {
         setIsSaving(true);
@@ -103,7 +113,7 @@ export default function EditPage() {
 
             if (projectError) throw projectError;
 
-            // 2. Sincroniza Parágrafos (Delete e Insert)
+            // 2. Sincroniza Parágrafos
             await supabase
                 .from("project_paragraphs")
                 .delete()
@@ -116,11 +126,9 @@ export default function EditPage() {
                     text: p.text,
                     order_index: i,
                 }));
-
                 const { error: pError } = await supabase
                     .from("project_paragraphs")
                     .insert(toInsert);
-
                 if (pError) throw pError;
             }
 
@@ -275,35 +283,63 @@ export default function EditPage() {
                                 />
                             </div>
                         </section>
-
-                        {/* BANNER */}
+                        {/* SEÇÃO BANNER COM PREVIEW INTELIGENTE */}
                         <section className="bg-zinc-950 border border-white/5 rounded-[2.5rem] p-8 space-y-6">
-                            <div className="flex items-center gap-2">
-                                <ImageIcon
-                                    size={18}
-                                    className="text-blue-600"
-                                />
-                                <span className="text-[10px] font-black uppercase tracking-widest">
-                                    Banner URL
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <ImageIcon
+                                        size={18}
+                                        className="text-blue-600"
+                                    />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">
+                                        Banner do Projeto
+                                    </span>
+                                </div>
+                                <span className="text-[8px] text-zinc-600 font-mono">
+                                    {siteBaseUrl}
                                 </span>
                             </div>
-                            <input
-                                value={bannerUrl}
-                                onChange={(e) =>
-                                    setBannerUrl(
-                                        e.target.value
-                                    )
-                                }
-                                placeholder="https://..."
-                                className="w-full bg-black border border-white/10 p-4 rounded-xl text-zinc-400 text-[10px] font-mono outline-none"
-                            />
-                            {bannerUrl && (
-                                <img
-                                    src={bannerUrl}
-                                    alt="Preview"
-                                    className="w-full aspect-video object-cover rounded-[2rem] border border-white/10"
+
+                            <div className="space-y-4">
+                                <input
+                                    value={bannerUrl}
+                                    onChange={(e) =>
+                                        setBannerUrl(
+                                            e.target.value
+                                        )
+                                    }
+                                    placeholder="/_next/static/media/imagem.png ou https://..."
+                                    className="w-full bg-black border border-white/10 p-4 rounded-xl text-zinc-400 text-[10px] font-mono outline-none focus:border-blue-600"
                                 />
-                            )}
+
+                                {bannerUrl && (
+                                    <div className="relative group overflow-hidden rounded-[2rem] border border-white/10">
+                                        <img
+                                            src={getFullImageUrl(
+                                                bannerUrl
+                                            )}
+                                            alt="Preview"
+                                            className="w-full aspect-video object-cover transition-transform duration-700 group-hover:scale-105"
+                                            onError={(
+                                                e
+                                            ) => {
+                                                (
+                                                    e.target as HTMLImageElement
+                                                ).src =
+                                                    "https://placehold.co/600x400/000000/FFFFFF?text=Erro+ao+carregar+imagem";
+                                            }}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                                            <p className="text-[8px] font-mono text-white/50 truncate w-full">
+                                                Fonte:{" "}
+                                                {getFullImageUrl(
+                                                    bannerUrl
+                                                )}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </section>
 
                         {/* BLOCOS DE TEXTO */}
