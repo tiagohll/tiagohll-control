@@ -5,6 +5,12 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado no [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-01-26
+
+### Adicionado
+
+- **Sistema de adicição de projetos:** Agora da para criar e modificar um projeto pelo nosso proprio dashboard em breve a documentação sobre o uso.
+
 ## [1.3.3] - 2026-01-26
 
 ### Modificado

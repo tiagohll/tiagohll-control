@@ -14,8 +14,8 @@ import { motion, AnimatePresence } from "framer-motion";
 // Estrutura de dados baseada no seu Changelog
 const VERSIONS_DATA = [
     {
-        version: "1.3.3",
-        date: "26 de Janeiro, 2026",
+        version: "1.4.0",
+        date: "03 de Fevereiro, 2026",
         changes: [
             {
                 type: "ia",
@@ -32,6 +32,7 @@ const VERSIONS_DATA = [
                 items: [
                     "Otimização de tokens para redução de latência na API",
                     "Minificação de dados de contexto enviados ao servidor",
+                    "Gestão de projetos do seu website pelo dashboard",
                 ],
             },
             {
