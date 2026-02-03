@@ -271,29 +271,47 @@ export function SystemSummary({
 
                 {/* Input Area */}
                 <div className="p-4 bg-zinc-900/30 border-t border-zinc-800/50 backdrop-blur-md">
-                    <div className="relative flex items-end gap-2 bg-black border border-zinc-800 rounded-2xl p-2 focus-within:border-blue-500/50 transition-all shadow-inner">
-                        <textarea
-                            ref={textAreaRef}
-                            rows={1}
-                            className="flex-1 bg-transparent border-none py-2.5 pl-3 pr-2 text-sm text-zinc-200 focus:outline-none resize-none max-h-40 placeholder:text-zinc-700"
-                            placeholder="Pergunte sobre os dados..."
-                            value={input}
-                            onChange={(e) =>
-                                setInput(e.target.value)
-                            }
-                            onKeyDown={handleKeyDown}
-                            disabled={isAnalyzing}
-                        />
-                        <button
-                            onClick={() => askAI()}
-                            disabled={
-                                isAnalyzing || !input.trim()
-                            }
-                            className="p-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl disabled:opacity-30 transition-all shadow-lg shrink-0"
-                        >
-                            <Send size={16} />
-                        </button>
+                    {/* Container Principal com p-[1px] para a borda aparecer */}
+                    <div className="relative group p-[1.5px] rounded-2xl overflow-hidden transition-all bg-zinc-800">
+                        {/* Camada da Borda IA - Só aparece se isAnalyzing for true */}
+                        <AnimatePresence>
+                            {isAnalyzing && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-[-1000%] animate-[shimmer-spin_2s_linear_infinite] bg-ia-gradient"
+                                />
+                            )}
+                        </AnimatePresence>
+
+                        {/* Inner Container (O corpo do input) */}
+                        <div className="relative flex items-end gap-2 bg-black rounded-[calc(1rem-1px)] p-2 focus-within:ring-1 focus-within:ring-blue-500/50 transition-all shadow-inner">
+                            <textarea
+                                ref={textAreaRef}
+                                rows={1}
+                                className="flex-1 bg-transparent border-none py-2.5 pl-3 pr-2 text-sm text-zinc-200 focus:outline-none resize-none max-h-40 placeholder:text-zinc-700"
+                                placeholder="Pergunte sobre os dados..."
+                                value={input}
+                                onChange={(e) =>
+                                    setInput(e.target.value)
+                                }
+                                onKeyDown={handleKeyDown}
+                                disabled={isAnalyzing}
+                            />
+                            <button
+                                onClick={() => askAI()}
+                                disabled={
+                                    isAnalyzing ||
+                                    !input.trim()
+                                }
+                                className="p-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl disabled:opacity-30 transition-all shadow-lg shrink-0"
+                            >
+                                <Send size={16} />
+                            </button>
+                        </div>
                     </div>
+
                     <div className="mt-2 text-center">
                         <p className="text-[8px] text-zinc-600 font-bold uppercase tracking-[0.2em]">
                             {siteName} Analytics

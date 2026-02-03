@@ -30,7 +30,6 @@ export default function DatabasePage() {
     const [projects, setProjects] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
 
-    // Estados do Modal
     const [isAddOpen, setIsAddOpen] = useState(false);
     const [newProjectTitle, setNewProjectTitle] =
         useState("");
@@ -47,7 +46,7 @@ export default function DatabasePage() {
                 .from("user_projects")
                 .select("*")
                 .eq("site_id", siteId)
-                .order("created_at", { ascending: false });
+                .order("order_index", { ascending: true });
 
             if (error) throw error;
             setProjects(data || []);
@@ -95,9 +94,9 @@ export default function DatabasePage() {
                 .insert([
                     {
                         title: newProjectTitle.toUpperCase(),
-                        category_type:
-                            newProjectCategory.toUpperCase(),
+                        category_type: newProjectCategory,
                         site_id: siteId,
+                        order_index: projects.length + 1,
                     },
                 ]);
             if (error) throw error;
@@ -187,53 +186,62 @@ export default function DatabasePage() {
                                             opacity: 0,
                                             scale: 0.9,
                                         }}
-                                        className="group bg-zinc-950 border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-blue-600/30 transition-all"
+                                        /* 'p-[1px]' cria o espaço da borda, 'relative' e 'group' controlam os efeitos */
+                                        className="relative group p-[1.5px] rounded-[2.5rem] overflow-hidden transition-all bg-zinc-900"
                                     >
-                                        <div className="aspect-[16/10] overflow-hidden bg-zinc-900 relative">
-                                            <img
-                                                src={
-                                                    project.image_banner ||
-                                                    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800"
-                                                }
-                                                alt=""
-                                                className="w-full h-full object-cover opacity-20 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 grayscale group-hover:grayscale-0"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
+                                        {/* 1. O Gradiente que gira (A Borda) */}
+                                        <div className="absolute inset-[-1000%] animate-[shimmer-spin_3s_linear_infinite] bg-ia-gradient opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500" />
 
-                                            {/* A URL aqui foi corrigida baseada na sua imagem de localhost */}
-                                            <Link
-                                                href={`/dashboard/${siteId}/edicao/projects/${project.id}`}
-                                                className="absolute inset-0 z-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40"
-                                            >
-                                                <div className="bg-white text-black p-4 rounded-full shadow-2xl scale-75 group-hover:scale-100 transition-transform duration-300">
-                                                    <Edit3
-                                                        size={
-                                                            20
-                                                        }
-                                                    />
-                                                </div>
-                                            </Link>
-                                        </div>
+                                        {/* 2. Opcional: Glow/Brilho extra (mesmo gradiente com blur) */}
+                                        <div className="absolute inset-[-1000%] animate-[shimmer-spin_3s_linear_infinite] bg-ia-gradient opacity-0 group-hover:opacity-40 blur-xl transition-opacity duration-500" />
 
-                                        <div className="p-8">
-                                            <span className="text-blue-600 text-[9px] font-black uppercase tracking-widest">
-                                                {project.category_type ||
-                                                    "SEM CATEGORIA"}
-                                            </span>
-                                            <h3 className="text-2xl font-black tracking-tighter mt-1">
-                                                {project.title ||
-                                                    "Sem Título"}
-                                            </h3>
-                                            <div className="mt-6 pt-6 border-t border-white/5 flex justify-end">
-                                                <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest flex items-center gap-2">
-                                                    Gerenciar
-                                                    Projeto{" "}
-                                                    <ArrowUpRight
-                                                        size={
-                                                            12
-                                                        }
-                                                    />
+                                        {/* 3. Conteúdo Principal (Overlay) */}
+                                        <div className="relative h-full w-full bg-zinc-950 rounded-[calc(2.5rem-1px)] overflow-hidden">
+                                            <div className="aspect-[16/10] overflow-hidden bg-zinc-900 relative">
+                                                <img
+                                                    src={
+                                                        project.image_banner ||
+                                                        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800"
+                                                    }
+                                                    alt=""
+                                                    className="w-full h-full object-cover opacity-20 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 grayscale group-hover:grayscale-0"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
+
+                                                <Link
+                                                    href={`/dashboard/${siteId}/edicao/projects/${project.id}`}
+                                                    className="absolute inset-0 z-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40"
+                                                >
+                                                    <div className="bg-white text-black p-4 rounded-full shadow-2xl scale-75 group-hover:scale-100 transition-transform duration-300">
+                                                        <Edit3
+                                                            size={
+                                                                20
+                                                            }
+                                                        />
+                                                    </div>
+                                                </Link>
+                                            </div>
+
+                                            <div className="p-8">
+                                                <span className="text-blue-600 text-[9px] font-black uppercase tracking-widest">
+                                                    {project.category_type ||
+                                                        "Sem Categoria"}
                                                 </span>
+                                                <h3 className="text-2xl font-black tracking-tighter mt-1">
+                                                    {project.title ||
+                                                        "Sem Título"}
+                                                </h3>
+                                                <div className="mt-6 pt-6 border-t border-white/5 flex justify-end">
+                                                    <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest flex items-center gap-2">
+                                                        Gerenciar
+                                                        Projeto{" "}
+                                                        <ArrowUpRight
+                                                            size={
+                                                                12
+                                                            }
+                                                        />
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </motion.div>
@@ -328,8 +336,8 @@ export default function DatabasePage() {
                                                         .value
                                                 )
                                             }
-                                            placeholder="EX: IDENTIDADE VISUAL"
-                                            className="w-full bg-black border border-white/10 p-5 rounded-2xl font-bold text-white uppercase outline-none focus:border-blue-600 transition-all"
+                                            placeholder="EX: Identidade Visual"
+                                            className="w-full bg-black border border-white/10 p-5 rounded-2xl font-bold text-white outline-none focus:border-blue-600 transition-all"
                                         />
                                     ) : (
                                         <div className="flex flex-wrap gap-2">
@@ -344,7 +352,7 @@ export default function DatabasePage() {
                                                                 cat
                                                             )
                                                         }
-                                                        className={`px-4 py-2 rounded-xl border text-[10px] font-black uppercase transition-all ${newProjectCategory === cat ? "bg-blue-600 border-blue-600 text-white" : "bg-black border-white/10 text-zinc-500 hover:border-white/30"}`}
+                                                        className={`px-4 py-2 rounded-xl border text-[10px] font-black transition-all ${newProjectCategory === cat ? "bg-blue-600 border-blue-600 text-white" : "bg-black border-white/10 text-zinc-500 hover:border-white/30"}`}
                                                     >
                                                         {
                                                             cat
