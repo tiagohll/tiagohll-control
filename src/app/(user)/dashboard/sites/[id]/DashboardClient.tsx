@@ -16,6 +16,7 @@ import QRCodeSection from "./qr-code-section";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import DatabaseSection from "./database-section";
+import { ProductTourModal } from "./product-tour";
 
 export default function DashboardClient({
     site,
@@ -25,6 +26,7 @@ export default function DashboardClient({
     qrStats,
 }: any) {
     const router = useRouter();
+    const [showTour, setShowTour] = useState(true);
     const [activeTab, setActiveTab] = useState("analises");
 
     const cleanStats = useMemo(() => {
@@ -68,6 +70,10 @@ export default function DashboardClient({
 
     return (
         <div className="min-h-screen bg-black text-white">
+            <ProductTourModal
+                isOpen={showTour}
+                onClose={() => setShowTour(false)}
+            />
             <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-6xl mx-auto px-8">
                     {/* Botão Voltar Discreto */}
