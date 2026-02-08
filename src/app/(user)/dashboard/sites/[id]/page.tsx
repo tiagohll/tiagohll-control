@@ -113,6 +113,22 @@ export default async function SitePage({
         })
     );
 
+    const { data: rawTours } = await supabase
+        .from("user_onboarding")
+        .select("tour_key")
+        .eq("user_id", site.user_id);
+
+    const completedTours =
+        rawTours?.map((t) => t.tour_key) || [];
+
+    const { data: activeTablesData } = await supabase
+        .from("site_tables")
+        .select("table_id")
+        .eq("site_id", id);
+
+    const activeTableIds =
+        activeTablesData?.map((t) => t.table_id) || [];
+
     return (
         <DashboardClient
             site={site}
@@ -123,6 +139,8 @@ export default async function SitePage({
             }}
             topPages={topPages}
             qrStats={qrStats}
+            completedTours={completedTours}
+            activeTableIds={activeTableIds}
         />
     );
 }

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import Lottie from "lottie-react";
 import stepOne from "../../../../../../public/animations/tour-step-1.json";
+import stepTwo from "../../../../../../public/animations/tour-step-2.json";
+import { createClient } from "@/lib/supabase/client";
 
 const steps = [
     {
@@ -15,28 +17,46 @@ const steps = [
         title: "Gerencie seus Projetos",
         description:
             "Altere capas, títulos e categorias com apenas alguns cliques de forma intuitiva.",
-        animation: null,
-    },
-    {
-        title: "Analytics e QR Codes",
-        description:
-            "Acompanhe o tráfego de cada projeto e gere QR Codes personalizados para seus clientes.",
-        animation: null,
+        animation: stepTwo,
     },
 ];
 
 export function ProductTourModal({
     isOpen,
     onClose,
+    userId,
 }: {
     isOpen: boolean;
     onClose: () => void;
+    userId: string;
 }) {
+    const supabase = createClient();
     const [currentStep, setCurrentStep] = useState(0);
 
     const nextStep = () => {
         if (currentStep < steps.length - 1) {
             setCurrentStep(currentStep + 1);
+        } else {
+            markTourAsComplete("editv1_tour");
+            onClose();
+        }
+    };
+
+    const markTourAsComplete = async (tourKey: string) => {
+        const supabaseClient = await supabase;
+
+        const { error } = await supabaseClient
+            .from("user_onboarding")
+            .upsert(
+                { user_id: userId, tour_key: tourKey },
+                { onConflict: "user_id,tour_key" }
+            );
+
+        if (error) {
+            console.error(
+                "Erro ao salvar progresso:",
+                error.message
+            );
         } else {
             onClose();
         }
@@ -53,7 +73,10 @@ export function ProductTourModal({
             >
                 {/* Botão Fechar */}
                 <button
-                    onClick={onClose}
+                    onClick={() => {
+                        onClose();
+                        markTourAsComplete("editv1_tour");
+                    }}
                     className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors z-10"
                 >
                     <X size={20} />
@@ -113,7 +136,12 @@ export function ProductTourModal({
 
                         <div className="flex items-center gap-4">
                             <button
-                                onClick={onClose}
+                                onClick={() => {
+                                    onClose();
+                                    markTourAsComplete(
+                                        "editv1_tour"
+                                    );
+                                }}
                                 className="text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
                             >
                                 Pular

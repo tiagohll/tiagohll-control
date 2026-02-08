@@ -24,10 +24,15 @@ export default function DashboardClient({
     stats,
     topPages,
     qrStats,
+    completedTours = [],
+    activeTableIds = [],
 }: any) {
     const router = useRouter();
-    const [showTour, setShowTour] = useState(true);
+    const [showTour, setShowTour] = useState(
+        !completedTours.includes("editv1_tour")
+    );
     const [activeTab, setActiveTab] = useState("analises");
+    const [isLoading, setIsLoading] = useState(true);
 
     const cleanStats = useMemo(() => {
         const realEvents = allEvents.filter(
@@ -68,12 +73,28 @@ export default function DashboardClient({
         return () => clearInterval(interval);
     }, [router]);
 
+    useEffect(() => {
+        if (
+            completedTours &&
+            !completedTours.includes("editv1_tour")
+        ) {
+            setShowTour(true);
+        }
+        setIsLoading(false);
+    }, [completedTours]);
+
+    if (isLoading) return null;
+
     return (
         <div className="min-h-screen bg-black text-white">
-            <ProductTourModal
-                isOpen={showTour}
-                onClose={() => setShowTour(false)}
-            />
+            {showTour && (
+                <ProductTourModal
+                    isOpen={showTour}
+                    onClose={() => setShowTour(false)}
+                    userId={site.user_id}
+                />
+            )}
+
             <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-6xl mx-auto px-8">
                     {/* Botão Voltar Discreto */}
@@ -218,7 +239,12 @@ export default function DashboardClient({
                             />
                         )}
                         {activeTab === "database" && (
-                            <DatabaseSection site={site} />
+                            <DatabaseSection
+                                site={site}
+                                activeTableIds={
+                                    activeTableIds
+                                }
+                            />
                         )}
                     </motion.div>
                 </AnimatePresence>
