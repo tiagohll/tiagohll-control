@@ -5,32 +5,32 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado no [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.0] - 2026-01-26
+## [0.4.0] - 2026-01-26
 
 ### Adicionado
 
 - **Sistema de adicição de projetos:** Agora da para criar e modificar um projeto pelo nosso proprio dashboard em breve a documentação sobre o uso.
 
-## [1.3.3] - 2026-01-26
+## [0.3.3] - 2026-01-26
 
 ### Modificado
 
 - **Admin Pages:** Páginas privadas de admin foram criadas.
 
-## [1.3.2] - 2026-01-18
+## [0.3.2] - 2026-01-18
 
 ### Modificado
 
 - **UI/UX da pagina de cliques:** Agora o scroll e limitado e foi adicionado um filtro de buscar para além de a ui dos cards ter ficado mais amigavel.
 
-## [1.3.1] - 2026-01-18
+## [0.3.1] - 2026-01-18
 
 ### Corrigido
 
 - **Growth do sumary Cards:** O valor estava sempre zerado agora ele realmente pega os valores reais.
 - **Documentação:** Atualizando a documentação para agora a versao que separa a origem do url.
 
-## [1.3.0] - 2026-01-18
+## [0.3.0] - 2026-01-18
 
 ### Adicionado
 
@@ -49,33 +49,33 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 - **Loop de Carregamento:** Correção do bug onde o componente de análise não liberava o estado de "loading" quando a API da Groq retornava erro.
 
-## [1.2.4] - 2026-01-14
+## [0.2.4] - 2026-01-14
 
 ### Corrigido
 
 - **Melhora na UI de Cliques:** Agora a UI esta igual o restando do sistema
 - **Metodo de salvar os hash de cliques:** vistor_hash no banco de dados irá ser o campo utilizado para salvar o nome do clique
 
-## [1.2.4] - 2026-01-14
+## [0.2.4] - 2026-01-14
 
 ### Corrigido
 
 - **Melhora na UI de Cliques:** Agora a UI esta igual o restando do sistema
 - **Metodo de salvar os hash de cliques:** vistor_hash no banco de dados irá ser o campo utilizado para salvar o nome do clique
 
-## [1.2.2] - 2026-01-14
+## [0.2.2] - 2026-01-14
 
 ### Corrigido
 
 - **Filtro de periodos:** Agora você filtra os dados de forma correta.
 
-## [1.2.1] - 2026-01-14
+## [0.2.1] - 2026-01-14
 
 ### Adicionado
 
 - **Resumo do sistema v.1.1:** Agora o resumo do sistema realmente analise da instruções.
 
-## [1.2.0] - 2026-01-14
+## [0.2.0] - 2026-01-14
 
 ### Adicionado
 
@@ -88,7 +88,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 - Erros de digitacão na página de documentação.
 
-## [1.1.0] - 2026-01-11
+## [0.1.0] - 2026-01-11
 
 ### Adicionado
 
@@ -103,7 +103,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 - Conectividade de API: Ajuste na configuração de cabeçalhos de segurança para permitir requisições de logs e visualizações de página para o domínio tiagohll-control.vercel.app.
 
-## [1.0.0] - 2026-01-08
+## [0.0.1] - 2026-01-08
 
 ### Adicionado
 

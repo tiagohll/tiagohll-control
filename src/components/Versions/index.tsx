@@ -14,8 +14,8 @@ import { motion, AnimatePresence } from "framer-motion";
 // Estrutura de dados baseada no seu Changelog
 const VERSIONS_DATA = [
     {
-        version: "1.4.0",
-        date: "03 de Fevereiro, 2026",
+        version: "0.7.0",
+        date: "13 de Fevereiro, 2026",
         changes: [
             {
                 type: "ia",
