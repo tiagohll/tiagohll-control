@@ -16,6 +16,7 @@ import {
     Layers,
     Hash,
     UserStarIcon,
+    Stars,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -39,6 +40,11 @@ const MENU_ITEMS = [
         name: "Financeiro",
         icon: PiggyBank,
         href: "/admin/finance",
+    },
+    {
+        name: "Feedbacks",
+        icon: Stars,
+        href: "/admin/feedbacks",
     },
     {
         name: "Projetos",
@@ -92,7 +98,7 @@ export function Sidebar() {
                             </span>
                         </span>
                         <span className="text-[9px] text-zinc-500 font-bold tracking-[1px] uppercase mt-1">
-                            v1.3.3
+                            v1.4.0
                         </span>
                     </div>
                 </div>

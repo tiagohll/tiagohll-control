@@ -129,6 +129,23 @@ export default async function SitePage({
     const activeTableIds =
         activeTablesData?.map((t) => t.table_id) || [];
 
+    // Lógica de 14 dias
+    const siteCreatedAt = new Date(
+        site.created_at
+    ).getTime();
+    const fourteenDaysInMs = 14 * 24 * 60 * 60 * 1000;
+    const isOldEnough =
+        Date.now() - siteCreatedAt > fourteenDaysInMs;
+
+    const { data: existingFeedback } = await supabase
+        .from("user_feedback")
+        .select("id")
+        .eq("site_id", site.id)
+        .eq("user_id", site.user_id)
+        .maybeSingle();
+
+    const showTrigger = isOldEnough && !existingFeedback;
+
     return (
         <DashboardClient
             site={site}
@@ -141,6 +158,7 @@ export default async function SitePage({
             qrStats={qrStats}
             completedTours={completedTours}
             activeTableIds={activeTableIds}
+            showFeedback={showTrigger}
         />
     );
 }

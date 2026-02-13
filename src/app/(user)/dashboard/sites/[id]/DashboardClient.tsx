@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import DatabaseSection from "./database-section";
 import { ProductTourModal } from "./product-tour";
+import FeedbackCollector from "@/components/Feedback/FeedbackCollector";
 
 export default function DashboardClient({
     site,
@@ -26,6 +27,7 @@ export default function DashboardClient({
     qrStats,
     completedTours = [],
     activeTableIds = [],
+    showFeedback = false,
 }: any) {
     const router = useRouter();
     const [showTour, setShowTour] = useState(
@@ -216,6 +218,14 @@ export default function DashboardClient({
             </header>
 
             <main className="p-8 max-w-6xl mx-auto">
+                <div className="p-2">
+                    <FeedbackCollector
+                        userId={site.user_id}
+                        siteId={site.id}
+                        showTrigger={showFeedback}
+                    />
+                </div>
+
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeTab}
