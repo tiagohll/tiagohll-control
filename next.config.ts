@@ -12,6 +12,16 @@ const nextConfig = {
     async headers() {
         return [
             {
+                source: "/(.*)",
+                headers: [
+                    {
+                        key: "Content-Security-Policy",
+                        value: "frame-src *; object-src 'none';",
+                        // O 'frame-src *' permite que seu dashboard abra QUALQUER site no iframe.
+                    },
+                ],
+            },
+            {
                 // Permite que qualquer site envie dados para sua rota de API
                 source: "/api/track",
                 headers: [

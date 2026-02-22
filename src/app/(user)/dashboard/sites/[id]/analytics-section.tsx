@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     BarChart3,
     ArrowUpRight,
@@ -14,6 +14,48 @@ export default function AnalyticsSection({
     topPages,
 }: any) {
     const [iframeError, setIframeError] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (isMounted && !iframeError) {
+            const updateScale = () => {
+                const iframe = document.getElementById(
+                    "preview-iframe"
+                );
+                const container = iframe?.parentElement;
+
+                if (iframe && container) {
+                    // Calcula a escala exata para a largura do container
+                    const scale =
+                        container.offsetWidth / 1280;
+
+                    iframe.style.transform = `scale(${scale})`;
+
+                    // Ajusta a altura do iframe para que o scale não deixe buracos
+                    // (Opcional: se quiser que o site preencha o fundo perfeitamente)
+                    iframe.style.height = `${container.offsetHeight / scale}px`;
+
+                    iframe.style.opacity = "1";
+                }
+            };
+
+            // Pequeno delay para o Next.js terminar de renderizar o container
+            const timer = setTimeout(updateScale, 100);
+
+            window.addEventListener("resize", updateScale);
+            return () => {
+                window.removeEventListener(
+                    "resize",
+                    updateScale
+                );
+                clearTimeout(timer);
+            };
+        }
+    }, [isMounted, iframeError]);
 
     return (
         <div className="space-y-10">
@@ -87,51 +129,45 @@ export default function AnalyticsSection({
 
                 <div className="relative aspect-video w-full bg-zinc-950 border border-zinc-800 rounded-[2.5rem] overflow-hidden group shadow-2xl">
                     {!iframeError ? (
-                        <iframe
-                            src={site.url}
-                            onError={() =>
-                                setIframeError(true)
-                            }
-                            className="w-[1280px] h-[720px] origin-top-left pointer-events-none opacity-30 group-hover:opacity-100 transition-all duration-1000"
-                            style={{
-                                transform:
-                                    "scale(calc(100% / 1280))",
-                                width: "1280px",
-                                height: "720px",
-                            }}
-                        />
+                        <div className="absolute inset-0 w-full h-full overflow-hidden flex items-start justify-start">
+                            <iframe
+                                id="preview-iframe"
+                                src={`${site.url}?preview=true`}
+                                loading="lazy"
+                                title="Preview do site"
+                                onError={() =>
+                                    setIframeError(true)
+                                }
+                                className="absolute top-0 left-0 border-none pointer-events-none origin-top-left transition-opacity duration-1000"
+                                style={{
+                                    width: "1280px",
+                                    height: "800px",
+                                    transform:
+                                        "scale(0.86)",
+                                    opacity: 0.8,
+                                }}
+                            />
+                        </div>
                     ) : (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4 bg-zinc-950">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950">
                             <EyeOff
                                 className="text-zinc-800"
                                 size={40}
                             />
-                            <div className="text-center">
-                                <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">
-                                    Preview Restrito
-                                </p>
-                                <p className="text-zinc-700 text-[10px] mt-1">
-                                    O site não permite
-                                    visualização interna por
-                                    segurança.
-                                </p>
-                            </div>
-                            <a
-                                href={site.url}
-                                target="_blank"
-                                className="bg-zinc-900 text-zinc-400 border border-zinc-800 px-5 py-2 rounded-xl text-[10px] font-black hover:bg-zinc-800 hover:text-white transition-all uppercase tracking-widest"
-                            >
-                                Abrir manualmente
-                            </a>
+                            <p className="text-zinc-500 text-xs font-bold uppercase mt-4">
+                                Preview Restrito
+                            </p>
                         </div>
                     )}
-
-                    {/* Overlay de Interação */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-all backdrop-blur-[2px]">
+                    <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.5)] rounded-[2.5rem]" />
+                    {/* Overlay para facilitar clique */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-all backdrop-blur-[1px]">
                         <a
-                            href={site.url}
+                            href={
+                                site.url + "?preview=true"
+                            }
                             target="_blank"
-                            className="bg-white text-black px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all hover:scale-105 active:scale-95"
+                            className="bg-white text-black px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em]"
                         >
                             Explorar Interface
                         </a>
