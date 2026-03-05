@@ -20,7 +20,7 @@ export const CHANGELOG_DATA: ChangelogEntry[] = [
         title: "Gestão Interna de Projetos",
         description:
             "Marco da implementação do sistema de criação e edição de projetos diretamente pelo dashboard administrativo.",
-        image: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?q=80&w=2670&auto=format&fit=crop",
+        image: "/changelogs/pre0.4.0.png",
         slug: "gestao-interna-projetos",
         status: "current",
         logs: [

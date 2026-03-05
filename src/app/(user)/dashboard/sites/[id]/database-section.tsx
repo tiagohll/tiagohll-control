@@ -10,6 +10,8 @@ import {
     CreditCard,
     Box,
     Lock,
+    Bookmark,
+    BookMarked,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -38,11 +40,11 @@ const tableConfigs: any = {
         icon: <FileText size={24} />,
         img: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=800&auto=format&fit=crop",
     },
-    project_details: {
-        name: "Logs de Projeto",
-        desc: "Detalhamento técnico e histórico",
-        icon: <Box size={24} />,
-        img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop",
+    blog: {
+        name: "Blog",
+        desc: "Publicações e artigos do site",
+        icon: <BookMarked size={24} />,
+        img: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
 };
 
