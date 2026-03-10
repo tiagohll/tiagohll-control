@@ -8,11 +8,38 @@ import {
     ShieldCheck,
     History,
     Sparkles,
+    ArrowRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 // Estrutura de dados baseada no seu Changelog
 const VERSIONS_DATA = [
+    {
+        version: "1.0.0",
+        date: "9 de Março, 2026",
+        changes: [
+            {
+                type: "added",
+                title: "Lançamento Oficial (v1.0.0)",
+                items: [
+                    "Implementação de Live Preview estilo Vercel com escalonamento dinâmico",
+                    "Sistema de segurança robusto com Content Security Policy (CSP) e frame-ancestors",
+                    "Integração de Analytics com filtro inteligente para ignorar previews",
+                    "Modo de exploração de interface em nova aba",
+                ],
+            },
+            {
+                type: "fixed",
+                title: "Corrigido",
+                items: [
+                    "Resolução de erros críticos de Hydration (React #418 e #423)",
+                    "Remoção de barras de rolagem nativas nos iframes de visualização",
+                    "Ajuste na responsividade do escalonamento de visualização (CSS transform)",
+                ],
+            },
+        ],
+    },
     {
         version: "0.7.0",
         date: "13 de Fevereiro, 2026",
@@ -118,6 +145,16 @@ export default function Versions() {
                                             }{" "}
                                             • {current.date}
                                         </p>
+                                        <Link
+                                            href="/changelog"
+                                            className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-200 mt-2"
+                                            target="_blank"
+                                        >
+                                            <ArrowRight
+                                                size={16}
+                                            />
+                                            Ver detalhes
+                                        </Link>
                                     </div>
                                     <button
                                         onClick={() =>

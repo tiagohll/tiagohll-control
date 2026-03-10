@@ -15,6 +15,42 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_DATA: ChangelogEntry[] = [
     {
+        version: "1.0.0",
+        date: "2026-03-09",
+        title: "Lançamento Oficial: THLL Control",
+        description:
+            "A primeira versão estável do painel de controle, focada em segurança de dados e uma experiência visual de alta fidelidade para monitoramento de projetos.",
+        image: "/changelog/v1-hero.png",
+        slug: "lancamento-v1-estavel",
+        status: "current",
+        logs: [
+            {
+                microVersion: "1.0.0",
+                updateTitle: "Visualização Estilo Vercel",
+                content:
+                    "Implementação de miniaturas inteligentes com renderização desktop (1280px) e escalonamento dinâmico via CSS Transform, garantindo nitidez e removendo barras de rolagem indesejadas.",
+            },
+            {
+                microVersion: "0.9.8",
+                updateTitle: "Segurança de Frame e CSP",
+                content:
+                    "Configuração de políticas de Content Security Policy (CSP) e frame-ancestors para permitir o embutimento seguro do site do cliente apenas dentro do dashboard autorizado.",
+            },
+            {
+                microVersion: "0.9.5",
+                updateTitle: "Correção de Hydration e SSR",
+                content:
+                    "Resolução dos erros críticos de React #418 e #423 através da sincronização de montagem no cliente, garantindo estabilidade no carregamento de componentes dinâmicos.",
+            },
+            {
+                microVersion: "0.9.2",
+                updateTitle: "Analytics Anti-Loop",
+                content:
+                    "Aprimoramento do script de rastreio para ignorar automaticamente visualizações originadas de Iframes, ambientes de Dashboard ou parâmetros de ?preview=true.",
+            },
+        ],
+    },
+    {
         version: "pre0.4.0",
         date: "26 Jan, 2026",
         title: "Gestão Interna de Projetos",
